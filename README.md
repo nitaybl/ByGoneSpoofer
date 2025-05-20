@@ -123,7 +123,7 @@ ByGone Spoofer is an independently developed tool. It operates on user's local m
 
 If Roblox Corporation or its designated legal representatives believe that this tool, or any part of its code or functionality, directly infringes upon Roblox's copyrighted materials or intellectual property in a manner that warrants a DMCA takedown notice, please direct all such formal communications to:
 
-📧 **`dmca@nitaybl.xyz`**
+📧 **`dmca@bygonsp.xyz`**
 
 We are committed to addressing legitimate concerns promptly and professionally. Please ensure your notice substantially complies with the requirements of the Digital Millennium Copyright Act.
 
@@ -144,7 +144,7 @@ We are committed to addressing legitimate concerns promptly and professionally. 
 
   * **For Bugs & Technical Problems:** If you encounter any issues, errors, or bugs while using ByGone Spoofer, please **create a new issue ticket on this GitHub repository.** This is the preferred method for tracking and resolving problems. *Individual support for troubleshooting via direct messages (e.g., Discord) is not provided for technical issues.*
   * **General Feedback & Questions:** For general feedback, suggestions, or non-critical questions, you can find **nitaybl** on Discord: `nitaybl`
-  * **DMCA/Legal:** For DMCA or other legal inquiries, please use `dmca@nitaybl.xyz` as noted above.
+  * **DMCA/Legal:** For DMCA or other legal inquiries, please use `dmca@bygonsp.xyz` as noted above.
 
 **Developed by nitaybl.**
 Copyright (c) 2025 nitaybl. All Rights Reserved.
