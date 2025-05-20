@@ -147,3 +147,4 @@ We are committed to addressing legitimate concerns promptly and professionally. 
   * **DMCA/Legal:** For DMCA or other legal inquiries, please use `dmca@nitaybl.xyz` as noted above.
 
 **Developed by nitaybl.**
+Copyright (c) 2025 nitaybl. All Rights Reserved.
