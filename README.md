@@ -8,7 +8,7 @@
 
 This tool is designed for users who understand the implications of modifying system identifiers and are looking for an automated way to manage potential hardware or account flags. **It is licensed strictly for personal, non-commercial, and educational use (see `LICENSE.md` for full terms).**
 
-*Disclaimer: This tool is provided **strictly for personal, non-commercial, and educational purposes only.** Users are solely responsible for their actions. Modifying system identifiers and attempting to circumvent bans may violate Roblox's Terms of Service. Please use this tool responsibly and at your own risk. Refer to the `[LICENSE.md](https://github.com/nitayb1/ByGoneSpoofer/blob/main/README.md)` file for full terms of use.*
+*Disclaimer: This tool is provided **strictly for personal, non-commercial, and educational purposes only.** Users are solely responsible for their actions. Modifying system identifiers and attempting to circumvent bans may violate Roblox's Terms of Service. Please use this tool responsibly and at your own risk. Refer to the [LICENSE.md](https://github.com/nitayb1/ByGoneSpoofer/blob/main/README.md) file for full terms of use.*
 
 ---
 
