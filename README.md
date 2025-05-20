@@ -1,3 +1,5 @@
+
+> **Note:** Inspired by the complexities of addressing a Roblox ban, ByGone Spoofer was created as an educational tool. It offers methods for managing system identifiers to help users achieve a 'clean slate,' intended for personal, non-commercial, and educational exploration.
 > **Note:** The detailed information in this README, while accurate to the script's functionality, was largely structured and written with the assistance of Google's Gemini, as the primary developer (@nitaybl) focused on coding.
 
 ---
