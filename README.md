@@ -1,4 +1,3 @@
-
 > **Note:** The detailed information in this README, while accurate to the script's functionality, was largely structured and written with the assistance of Google's Gemini, as the primary developer (@nitaybl) focused on coding.
 
 ---
@@ -137,6 +136,7 @@ We are committed to addressing legitimate concerns promptly and professionally. 
   * **Roblox Terms of Service:** Using tools to circumvent bans or manipulate game software typically violates Roblox's Terms of Service and can lead to further account actions.
   * **System Changes:** This script makes changes to your system's network configuration (MAC addresses) and software installations. Understand these changes before running the script.
   * **Network Interruption:** MAC address changes require temporarily disabling and re-enabling network adapters, which will briefly disconnect your internet.
+  * **Consider Using a VPN (Optional but Recommended):** After running ByGone Spoofer, for an additional layer of privacy and to change your IP address (another potential tracking point), consider using a reputable VPN service. Services like Cloudflare WARP can be an option.
 
 -----
 
