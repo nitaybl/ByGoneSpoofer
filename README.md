@@ -1,3 +1,4 @@
+# ByGone Spoofer - Now Updated! (v1.1+) Enhanced HWID Spoofing & More!
 
 > **Why Did You Create this?:** Inspired by the complexities of addressing a Roblox ban, ByGone Spoofer was created as an educational tool. It offers methods for managing system identifiers to help users achieve a 'clean slate,' intended for personal, non-commercial, and educational exploration.
 
@@ -102,14 +103,14 @@ If you prefer to run the script directly from its Python source code (`.py` file
 Open your command prompt or PowerShell and install the required Python modules:
 ```bash
 pip install requests colorama
-````
+```
 
 ### How to Run the `.py` Script:
 
 1.  **Download:** Obtain the `ByGoneSpoofer.py` script.
 2.  **Open Terminal:** Navigate to the directory where you saved the script using Command Prompt or PowerShell.
 3.  **Run as Administrator:** You **must** run the script from a terminal that has administrator privileges.
-      * Right-click on Command Prompt/PowerShell and select "Run as administrator". Then navigate to the script directory.
+    * Right-click on Command Prompt/PowerShell and select "Run as administrator". Then navigate to the script directory.
 4.  **Execute the Script:**
     ```bash
     python ByGoneSpoofer.py
@@ -134,20 +135,20 @@ We are committed to addressing legitimate concerns promptly and professionally. 
 
 ## ⚠️ Important Considerations
 
-  * **Educational & Personal Use Only:** This software is licensed strictly for personal, non-commercial, and educational purposes. Please refer to `LICENSE.md` for detailed terms.
-  * **Effectiveness Not Guaranteed:** While this tool automates common steps believed to help with ban evasion, its success can vary greatly depending on Roblox's detection methods and individual circumstances.
-  * **Roblox Terms of Service:** Using tools to circumvent bans or manipulate game software typically violates Roblox's Terms of Service and can lead to further account actions.
-  * **System Changes:** This script makes changes to your system's network configuration (MAC addresses) and software installations. Understand these changes before running the script.
-  * **Network Interruption:** MAC address changes require temporarily disabling and re-enabling network adapters, which will briefly disconnect your internet.
-  * **Consider Using a VPN (Optional but Recommended):** After running ByGone Spoofer, for an additional layer of privacy and to change your IP address (another potential tracking point), consider using a reputable VPN service. Services like Cloudflare WARP can be an option.
+* **Educational & Personal Use Only:** This software is licensed strictly for personal, non-commercial, and educational purposes. Please refer to `LICENSE.md` for detailed terms.
+* **Effectiveness Not Guaranteed:** While this tool automates common steps believed to help with ban evasion, its success can vary greatly depending on Roblox's detection methods and individual circumstances.
+* **Roblox Terms of Service:** Using tools to circumvent bans or manipulate game software typically violates Roblox's Terms of Service and can lead to further account actions.
+* **System Changes:** This script makes changes to your system's network configuration (MAC addresses) and software installations. Understand these changes before running the script.
+* **Network Interruption:** MAC address changes require temporarily disabling and re-enabling network adapters, which will briefly disconnect your internet.
+* **Consider Using a VPN (Optional but Recommended):** After running ByGone Spoofer, for an additional layer of privacy and to change your IP address (another potential tracking point), consider using a reputable VPN service. Services like Cloudflare WARP can be an option.
 
 -----
 
 ## 📞 Contact, Feedback & Issue Reporting
 
-  * **For Bugs & Technical Problems:** If you encounter any issues, errors, or bugs while using ByGone Spoofer, please **create a new issue ticket on this GitHub repository.** This is the preferred method for tracking and resolving problems. *Individual support for troubleshooting via direct messages (e.g., Discord) is not provided for technical issues.*
-  * **General Feedback & Questions:** For general feedback, suggestions, or non-critical questions, you can find **nitaybl** on Discord: `nitaybl`
-  * **DMCA/Legal:** For DMCA or other legal inquiries, please use `dmca@bygonsp.xyz` as noted above.
+* **For Bugs & Technical Problems:** If you encounter any issues, errors, or bugs while using ByGone Spoofer, please **create a new issue ticket on this GitHub repository.** This is the preferred method for tracking and resolving problems. *Individual support for troubleshooting via direct messages (e.g., Discord) is not provided for technical issues.*
+* **General Feedback & Questions:** For general feedback, suggestions, or non-critical questions, you can find **nitaybl** on Discord: `nitaybl`
+* **DMCA/Legal:** For DMCA or other legal inquiries, please use `dmca@bygonsp.xyz` as noted above.
 
 **Developed by nitaybl.**
 Copyright (c) 2025 nitaybl. All Rights Reserved.
