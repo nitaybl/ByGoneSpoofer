@@ -1,4 +1,4 @@
-# ByGone Spoofer - Now Updated! (v1.1+) Enhanced HWID Spoofing & More!
+# ByGone Spoofer - Now Updated! (v1.1.1) Enhanced HWID Spoofing & More!
 
 > **Why Did You Create this?:** This project was a personal learning exercise focused on exploring system interactions, software automation, and local identifier management through practical script development.
 
