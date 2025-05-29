@@ -5,6 +5,8 @@
 > **Note:** The detailed information in this README, while accurate to the script's functionality, was largely structured and written with the assistance of Google's Gemini, as the primary developer (@nitaybl) focused on coding.
 
 > **Is it true that you hate your life?:** Yes.
+
+> **Do You Provide Support:** We Do Provide support in our discord server at https://discord.gg/ysYGTJuKqv
 ---
 
 # ByGone Spoofer by @nitaybl 🛡️
