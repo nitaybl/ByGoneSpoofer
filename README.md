@@ -1,8 +1,8 @@
 # ByGone Spoofer - Now Updated! (v1.1.1) Enhanced HWID Spoofing & More!
 
-> **Why Did You Create this?:** This project was a personal learning exercise focused on exploring system interactions, software automation, and local identifier management through practical script development.
+> **Why Did You Create this?:** i was bored and wanted to fool around with gemini and reliaised that changing your mac and resintalling roblox prob isnt enough
 
-> **Note:** The detailed information in this README, while accurate to the script's functionality, was largely structured and written with the assistance of Google's Gemini, as the primary developer (@nitaybl) focused on coding.
+> **Is It free?:** YES
 
 > **Is it true that you hate your life?:** Yes.
 
@@ -11,83 +11,48 @@
 
 # ByGone Spoofer by @nitaybl 🛡️
 
-**ByGone Spoofer** is an automated Python utility crafted to assist users in addressing Roblox ban-related issues, particularly those associated with the Byfron anti-cheat system. It aims to provide a comprehensive solution by performing a thorough system cleanup, modifying key system identifiers, and reinstalling a fresh version of Roblox.
-
+**ByGone Spoofer** is a spoofer i created to circuvment roblox bans which are handeled by hyperion?, THIS TOOL DOES NOT REMOVE YOUR ACCOUNT BAN AND IM NOT RESPONSIBLE FOR ANYTHING YOU DO WITH IT this is for educational purposes ONLY
 This tool is designed for users who understand the implications of modifying system identifiers and are looking for an automated way to manage potential hardware or account flags. **It is licensed strictly for personal, non-commercial, and educational use (see `LICENSE.md` for full terms).**
 
 *Disclaimer: This tool is provided **strictly for personal, non-commercial, and educational purposes only.** Users are solely responsible for their actions. Modifying system identifiers and attempting to circumvent bans may violate Roblox's Terms of Service. Please use this tool responsibly and at your own risk. Refer to the [LICENSE.md](https://github.com/nitayb1/ByGoneSpoofer/blob/main/README.md) file for full terms of use.*
 
 ---
 
-## 🌟 Key Features & Functionality
+## What does it do?
 
-ByGone Spoofer automates a sequence of operations to refresh your Roblox environment:
-
-1.  **Administrator Privileges:**
-    * Automatically checks if the script is running with administrator privileges.
-    * If not, it attempts to re-launch itself with elevated rights, as these are necessary for most of its core functions.
-
-2.  **Roblox Process Termination:**
-    * Ensures a clean slate by force-closing all known running Roblox processes (e.g., `RobloxPlayerBeta.exe`, `RobloxPlayerLauncher.exe`, `RobloxStudio.exe`) before any cleaning or modification tasks begin.
-
-3.  **Comprehensive Roblox Data Cleansing:**
-    * **Cookie Deletion:** Targets and removes Roblox cookies and related browser data from common storage locations within `LOCALAPPDATA` and `APPDATA`, including specific Roblox package paths, to clear session and tracking information.
-    * **Trace File Removal (Implied):** While not explicitly listing every file, the uninstallation and cookie deletion aim to remove common trace files left by the client.
-
-4.  **Thorough Roblox Uninstallation:**
-    * **Official Uninstaller:** Attempts to silently execute the official Roblox uninstaller found in the system registry.
-    * **Manual File Removal:** As a fallback or supplementary step, it performs a manual deletion of common Roblox installation directories (`%LOCALAPPDATA%\Roblox`, Program Files paths) to ensure a more complete removal.
-
-5.  **Automated MAC Address Spoofing:**
-    * **Adapter Detection:** Identifies all enabled network interface controllers (NICs) on your system using `netsh` and `wmic`.
-    * **Random MAC Generation:** For each detected adapter, it generates a new, valid, and randomized MAC address. The generation logic ensures the second character of the first octet is one of `A`, `E`, `2`, or `6` for better compatibility, especially with wireless adapters.
-    * **Registry Modification:** Applies the new MAC address by modifying the `NetworkAddress` value in the Windows Registry for the specific adapter (`HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e972-e325-11ce-bfc1-08002be10318}\XXXX`).
-    * **Adapter Reset:** Disables and then re-enables each modified network adapter via `netsh` commands to ensure the new MAC address takes effect.
-
-6.  **Roblox Client Reinstallation:**
-    * **Secure Download:** Downloads the latest Roblox client installer from official Roblox URLs. It first attempts to use `curl` (if available) and falls back to Python's `requests` library for robustness.
-    * **Silent Installation:** Executes the downloaded installer with silent flags (`/S`) for an automated, non-interactive setup of a fresh Roblox client.
-
-7.  **User-Friendly Console Interface:**
-    * **Clear Visuals:** Displays a distinctive ASCII art banner upon launch.
-    * **Status Updates:** Provides real-time, color-coded (via Colorama) status messages for each major operation.
-    * **Progress Indicators:** Shows progress bars for time-consuming tasks like file deletion and installation waits, enhancing user experience.
-    * **Internet Check:** Verifies internet connectivity before attempting to download the Roblox installer.
-
+It Does all of the following order to circuvment your ban
+1.  Reqests admin privilegies so it can do all of the circumventing for you
+2.  Checks if you have an internet connection
+3.  Kills roblox so you can actually delete it
+4.  Uninstalls roblox for you with automatic installer, does have a fall back to delete manually
+5.  Deletes cookies traces and related roblox registry keys (not hyperion)
+6.  Spoofs your mac for your ethernet/wifi/vpn adapters.
+7.  Spoofs and changes your monitor edid
+8.  Removes hyperion identifying registry value from registry
+9.  Spoofs your smbios using Amidewin (Only For Supported Motherboards)
+10.  Restarts Wmi Service To Make Sure Hwid Changes Propagate
+11.  Grabs roblox installer exe and attempts to install it for you (just means it runs automaticlly the installer)
+12.  Verifies it installed And Cleans Up the installer exe
 ---
 
-## ⚙️ How It Works (Operational Flow)
+## 🚀 How to Use (Using the `.exe`)
 
-ByGone Spoofer follows a systematic process:
+If you lazy and just want the exe:
 
-1.  **Initialization:** Checks for admin rights and internet connectivity.
-2.  **Cleanup Phase 1:** Kills active Roblox processes.
-3.  **Cleanup Phase 2:** Deletes Roblox cookies and associated local data.
-4.  **Uninstallation:** Removes the existing Roblox client.
-5.  **Spoofing Phase:** Changes the MAC addresses of all enabled network adapters.
-6.  **Reinstallation:** Downloads and installs a fresh Roblox client.
-7.  **Completion:** Reports that all operations are completed.
-
----
-
-## 🚀 How to Use (Using the `.exe` Executable)
-
-If you have downloaded the pre-compiled `ByGoneSpoofer.exe`:
-
-1.  **Download:** Obtain the `ByGoneSpoofer.exe` file.
-2.  **Run the Executable:** Simply double-click `ByGoneSpoofer.exe` to run it.
+1.  **Download:** Go to releases and download the latest exe
+2.  **Run the EXE:** Just double-click `ByGoneSpoofer.exe` to run it.
 3.  **Administrator Prompt:** The application requires administrator privileges. If you are not already running it as an administrator, a UAC (User Account Control) prompt should appear. Please click "Yes" to grant these permissions.
-4.  **Automated Process:** The script will then proceed through all the steps automatically. Monitor the console output for progress.
+4.  **Automated Process:** The exe will go through the steps explained above
 5.  **Encountering Problems?** If you face any issues or errors, please **open an issue ticket** on this GitHub repository.
 6.  **Completion:** Once finished, it will display an "All operations completed!" message. A system restart might be beneficial for all changes to fully propagate.
 
 **General Requirements (for `.exe` users):**
-* **Operating System:** Windows.
+* **Operating System:** Windows 10 (Should Work On 11,8,7).
 * **Permissions:** Administrator privileges are mandatory.
 * **Internet Connection:** Required for downloading the Roblox installer.
 
 ---
-
+ill let gemini explain this section:
 ## 🐍 Using the Python Source Code (Advanced Users)
 
 If you prefer to run the script directly from its Python source code (`.py` file):
