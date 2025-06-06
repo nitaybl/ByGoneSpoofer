@@ -12,10 +12,11 @@ By installing, copying, or otherwise using the Software, you agree to be bound b
 2.  **Restrictions:** You may NOT:
     a.  Copy, modify, adapt, translate, or create derivative works based on the Software (either the source code or the compiled executable) without the prior written consent of the Author.
     b.  Decompile, reverse engineer, disassemble, or otherwise attempt to derive the source code for the Software, except and only to the extent that such activity is expressly permitted by applicable law notwithstanding this limitation.
-    c.  Rent, lease, lend, sell, sublicense, assign, distribute, publish, transfer, or otherwise make available the Software, or any features or functionality of the Software, to any third party for any reason, without the prior written consent of the Author. This includes hosting the Software for download or direct access by others.
+    c.  Rent, lease, lend, sell, sublicense, assign, distribute, publish, transfer, or otherwise make available the Software, or any features or functionality of the Software, to any third party for any reason, without the prior written consent of the Author.
     d.  Remove, alter, or obscure any copyright, trademark, or other proprietary notices or labels on or in the Software.
     e.  Claim the Software, in whole or in part, or any of its associated code or functionalities, as your own work. All authorship and intellectual property rights remain with the Author.
     f.  Use the Software for any purpose other than the strictly personal, non-commercial, and educational purposes granted in Clause 1, or in any manner that violates any applicable local, state, national, or international law or regulation.
+    g.  **Host, re-upload, or mirror the Software or its source code on any public or private repository, server, or file-sharing service (including, but not limited to, GitHub) without the prior written consent of the Author.**
 
 3.  **Intellectual Property:**
     All title, including but not limited to copyrights, in and to the Software and any copies thereof are owned by the Author. All rights not expressly granted are reserved by the Author.
