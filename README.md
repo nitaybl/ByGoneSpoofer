@@ -7,6 +7,7 @@ For the complete guide, feature explanations, license details, and the latest do
 ## ➡️ **[https://bygonsp.xyz](https://bygonsp.xyz)** ⬅️
 
 This GitHub repository will remain for source code hosting and issue tracking. All user-facing documentation will now be maintained on the new site.
+est running time of script: ~120 secs
 
 ---
 
