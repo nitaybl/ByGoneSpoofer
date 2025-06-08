@@ -1,4 +1,4 @@
-# ByGone Spoofer by @nitaybl NEW VERSION WITH MORE TRACES & FIXED MAC WOOFER AND REGISTRY WORKS! (1.2v)
+# ByGone Spoofer by @nitaybl NEW VERSION WITH MORE TRACES & FIXED MAC WOOFER AND REGISTRY WORKS! (1.2.1v)
 
 ### The official documentation, interactive guide, and full description have moved!
 
