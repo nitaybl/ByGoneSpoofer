@@ -1,0 +1,45 @@
+{
+  "name": "ByGone Spoofer",
+  "logo": {
+    "dark": "/Black.svg",
+    "light": "/White.svg"
+  },
+  "favicon": "/favicon.png",
+  "colors": {
+    "primary": "#7dcfff",
+    "light": "#a9b1d6",
+    "dark": "#1a1b26",
+    "background": {
+        "dark": "#1a1b26"
+    }
+  },
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "introduction",
+        "features",
+        "usage",
+        "changelog"
+      ]
+    },
+    {
+      "group": "Community & Legal",
+      "pages": [
+        {
+          "group": "Links",
+          "pages": [
+            {
+              "name": "GitHub Repo",
+              "url": "https://github.com/nitaybl/ByGoneSpoofer"
+            },
+            {
+              "name": "Join Discord",
+              "url": "https://discord.gg/ysYGTJuKqv"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
