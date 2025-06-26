@@ -65,8 +65,8 @@ class UI:
            \______/                                                                                   |__/
 """
         print(f"{Theme.PRIMARY}{banner_art}{Theme.RESET}")
-        title = "Nitaybl's ByGone Spoofer (Focused Hyperion)"
-        version = "Version: v4.0 (Patched)"
+        title = "Nitaybl's ByGone Spoofer (join discord.gg/bygone)"
+        version = "Version: v4.1"
         line = UI.LINE_H * (UI.WIDTH - 2)
         print(f"{Theme.PRIMARY}{UI.CORNER_TL}{line}{UI.CORNER_TR}{Theme.RESET}")
         print(
@@ -560,7 +560,7 @@ def change_mac_address_integrated():
                 changed_count += 1
             time.sleep(1)
         if changed_count > 0:
-            UI.print_status(f"{changed_count} MAC address(es) spoofed. RESTART RECOMMENDED.", status='success')
+            UI.print_status(f"{changed_count} MAC address(es) spoofed.", status='success')
     except Exception as e:
         UI.print_status(f"An error occurred during MAC spoofing: {e}", status='error')
 
@@ -703,7 +703,7 @@ def modify_monitor_edids():
         UI.print_status(f"Error accessing display registry for EDID: {e_base}", status='error')
 
     if changed_count > 0:
-        UI.print_status(f"{changed_count} monitor EDID(s) modified. RESTART REQUIRED.", status='success')
+        UI.print_status(f"{changed_count} monitor EDID(s) modified.", status='success')
     else:
         UI.print_status("No monitors found or EDIDs modified.", status='warning')
 
@@ -814,7 +814,7 @@ def spoof_smbios_with_amidewin_focused():
     UI.print_progress_bar(total_cmds, total_cmds, prefix='SMBIOS Update:', suffix='Done!'.ljust(20), length=30,
                           color=Theme.SUCCESS)
     if success_count > 0:
-        UI.print_status("AMIDEWIN commands issued. RESTART IS CRITICAL.", status='success')
+        UI.print_status("AMIDEWIN commands issued.", status='success')
         return True
     else:
         UI.print_status("No AMIDEWIN SMBIOS commands succeeded.", status='error')
@@ -876,7 +876,7 @@ def perform_all_spoofing_operations():
     install_roblox()
 
     UI.print_header("All Operations Completed")
-    UI.print_status("A FULL SYSTEM RESTART IS REQUIRED FOR ALL CHANGES TO TAKE EFFECT!", status='success')
+    UI.print_status("Join Our Server At discord.gg/bygone and star the project pls i need to feed my kids", status='success')
     return True
 
 
