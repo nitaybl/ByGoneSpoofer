@@ -887,15 +887,6 @@ def main():
         os.system('cls')
     UI.print_banner()
 
-    if not is_admin():
-        UI.print_status("Admin privileges required. Restarting with admin rights...", status='warning')
-        time.sleep(2)
-        restart_with_admin()
-        # The script will exit here and restart. The check below is for the new instance.
-        if not is_admin():
-            UI.print_status("Failed to acquire admin privileges. Exiting.", status='error')
-            sys.exit(1)
-
     UI.print_status("Running as administrator.", status='success')
     if not PYWIN32_AVAILABLE:
         UI.print_status("pywin32 not found. Some features might have fallbacks.", status='warning')
