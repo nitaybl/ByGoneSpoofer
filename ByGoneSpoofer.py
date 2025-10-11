@@ -409,6 +409,10 @@ def backup_hardware_ids():
         with open(backup_file, 'w', encoding='utf-8') as f:
             json.dump(backup_data, f, indent=2)
         UI.print_status(f"✓ Hardware backup saved to: {backup_file}", status='success')
+        
+        # Also backup EDID registry
+        backup_edid_registry()
+        
         operation_logger.log("Backup Hardware IDs", True, backup_file)
         return backup_file
     except Exception as e:
@@ -417,8 +421,57 @@ def backup_hardware_ids():
         return None
 
 
+def backup_edid_registry():
+    """Backs up EDID monitor registry keys."""
+    UI.print_status("Backing up EDID registry keys...", status='action')
+    backup_file = os.path.join(os.environ.get('APPDATA', ''), 'ByGoneEDIDBackup.reg')
+    
+    edid_keys = [
+        r"HKLM\SYSTEM\CurrentControlSet\Enum\DISPLAY",
+        r"HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e96e-e325-11ce-bfc1-08002be10318}"
+    ]
+    
+    try:
+        for key in edid_keys:
+            export_cmd = f'reg export "{key}" "{backup_file}" /y'
+            result = _run_shell_command_simple(export_cmd, shell=True, capture_output_if_no_pipes=True)
+            if result and result.returncode == 0:
+                UI.print_status(f"✓ EDID registry backed up to: {backup_file}", status='success')
+                operation_logger.log("Backup EDID", True, backup_file)
+                return backup_file
+        return None
+    except Exception as e:
+        UI.print_status(f"Could not backup EDID: {e}", status='warning')
+        operation_logger.log("Backup EDID", False, str(e))
+        return None
+
+
+def restore_edid_from_backup():
+    """Restores EDID from backed up registry file."""
+    UI.print_status("Restoring EDID from backup...", status='action')
+    backup_file = os.path.join(os.environ.get('APPDATA', ''), 'ByGoneEDIDBackup.reg')
+    
+    if not os.path.exists(backup_file):
+        UI.print_status("No EDID backup found.", status='warning')
+        return False
+    
+    try:
+        import_cmd = f'reg import "{backup_file}"'
+        result = _run_shell_command_simple(import_cmd, shell=True, capture_output_if_no_pipes=True)
+        if result and result.returncode == 0:
+            UI.print_status("✓ EDID restored from backup!", status='success')
+            UI.print_status("⚠️  Reboot required for changes to take effect", status='warning')
+            operation_logger.log("Restore EDID", True, "Success")
+            return True
+        return False
+    except Exception as e:
+        UI.print_status(f"Error restoring EDID: {e}", status='error')
+        operation_logger.log("Restore EDID", False, str(e))
+        return False
+
+
 def restore_from_backup():
-    """Restores hardware IDs from backup file (MAC addresses only)."""
+    """Restores hardware IDs from backup file - MAC, HWID, and EDID."""
     UI.print_header("Restore from Backup")
     backup_file = os.path.join(os.environ.get('APPDATA', ''), 'ByGoneHardwareBackup.json')
     
@@ -432,37 +485,99 @@ def restore_from_backup():
             backup_data = json.load(f)
         
         UI.print_status(f"Found backup from: {backup_data.get('timestamp', 'Unknown')}", status='info')
-        UI.print_status("⚠️  Note: Only MAC addresses can be restored. SMBIOS/HWID cannot be reversed via backup.", status='warning')
+        UI.print_status("This will restore: MAC addresses, HWID/SMBIOS, and EDID", status='info')
         
-        confirm = UI.get_input("Restore MAC addresses from backup? (yes/no)")
+        confirm = UI.get_input("Restore all hardware IDs from backup? (yes/no)")
         if confirm != 'yes':
             UI.print_status("Restore cancelled.", status='warning')
             return False
         
-        restored = 0
+        # Restore MAC addresses
+        restored_mac = 0
         adapters_to_restore = backup_data.get('network_adapters', [])
+        UI.print_status("Restoring MAC addresses...", status='action')
         for adapter_info in adapters_to_restore:
             nic_name = adapter_info.get('name')
             nic_index = adapter_info.get('index')
             original_mac = adapter_info.get('original_mac', '').replace('-', '').replace(':', '')
             
             if nic_name and nic_index and original_mac and len(original_mac) == 12:
-                UI.print_status(f"Restoring {nic_name} to MAC: {original_mac}", status='action', indent=2)
+                UI.print_status(f"Restoring {nic_name} to MAC: {original_mac}", status='info', indent=2)
                 if set_mac_address_new(nic_name, nic_index, original_mac):
-                    restored += 1
+                    restored_mac += 1
         
-        if restored > 0:
-            UI.print_status(f"✓ Restored {restored} MAC address(es) from backup!", status='success')
-            operation_logger.log("Restore from Backup", True, f"{restored} MACs restored")
-            return True
-        else:
-            UI.print_status("No MAC addresses were restored.", status='warning')
-            operation_logger.log("Restore from Backup", False, "No MACs restored")
-            return False
+        if restored_mac > 0:
+            UI.print_status(f"✓ Restored {restored_mac} MAC address(es)", status='success')
+        
+        # Restore HWID/SMBIOS using saved data
+        system_info = backup_data.get('original_system_info', {})
+        if system_info:
+            UI.print_status("Restoring HWID/SMBIOS...", status='action')
+            restore_hwid_from_backup(system_info)
+        
+        # Restore EDID
+        restore_edid_from_backup()
+        
+        UI.print_status("✓ Restore complete! Reboot recommended.", status='success')
+        operation_logger.log("Restore from Backup", True, f"{restored_mac} MACs, HWID, EDID restored")
+        return True
             
     except Exception as e:
         UI.print_status(f"Error restoring from backup: {e}", status='error')
         operation_logger.log("Restore from Backup", False, str(e))
+        return False
+
+
+def restore_hwid_from_backup(system_info):
+    """Restores HWID/SMBIOS from saved system info using AMIDEWINx64."""
+    try:
+        # Parse saved BIOS info
+        bios_data = system_info.get('bios', '')
+        baseboard_data = system_info.get('baseboard', '')
+        computersystem_data = system_info.get('computersystem', '')
+        
+        # Extract serial numbers from CSV format
+        def parse_wmic_line(data):
+            lines = data.split('\n')
+            if len(lines) >= 2:
+                headers = lines[0].split(',')
+                values = lines[1].split(',')
+                return dict(zip(headers, values))
+            return {}
+        
+        bios_info = parse_wmic_line(bios_data)
+        board_info = parse_wmic_line(baseboard_data)
+        system_uuid_info = parse_wmic_line(computersystem_data)
+        
+        # Use AMIDEWINx64 to restore original values
+        amidewin_path = get_bundled_amidewin()
+        if not amidewin_path:
+            UI.print_status("AMIDEWINx64 not found. Cannot restore HWID.", status='error')
+            return False
+        
+        # Restore BIOS serial
+        if 'SerialNumber' in bios_info and bios_info['SerialNumber']:
+            cmd = f'"{amidewin_path}" /BS {bios_info["SerialNumber"]}'
+            _run_shell_command_simple(cmd, shell=True)
+            UI.print_status(f"✓ Restored BIOS serial", status='success', indent=2)
+        
+        # Restore Board serial
+        if 'SerialNumber' in board_info and board_info['SerialNumber']:
+            cmd = f'"{amidewin_path}" /SS {board_info["SerialNumber"]}'
+            _run_shell_command_simple(cmd, shell=True)
+            UI.print_status(f"✓ Restored Board serial", status='success', indent=2)
+        
+        # Restore System UUID
+        if 'UUID' in system_uuid_info and system_uuid_info['UUID']:
+            cmd = f'"{amidewin_path}" /SU {system_uuid_info["UUID"]}'
+            _run_shell_command_simple(cmd, shell=True)
+            UI.print_status(f"✓ Restored System UUID", status='success', indent=2)
+        
+        UI.print_status("HWID/SMBIOS restore complete", status='success')
+        return True
+        
+    except Exception as e:
+        UI.print_status(f"Error restoring HWID: {e}", status='warning')
         return False
 
 
