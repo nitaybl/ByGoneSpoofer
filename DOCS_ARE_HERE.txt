@@ -1,0 +1,140 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                    📚 DOCUMENTATION MOVED TO /docs/ 📚                       ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+All documentation files have been organized into the 'docs' folder!
+
+==============================================================================
+                        📂 DOCUMENTATION LOCATION:
+==============================================================================
+
+📁 Folder: /docs/
+
+All README files, guides, and documentation are now in:
+    C:\Users\nitaybl\PyCharmMiscProject\docs\
+
+==============================================================================
+                        📖 WHAT'S IN THE /docs/ FOLDER:
+==============================================================================
+
+Main Documentation:
+├── README.md ⭐ (Main documentation)
+├── ROBLOX_2025_GUIDE.md ⭐ (Anti-cheat bypass guide)
+├── START_HERE.md (Folder index)
+└── READ_ME_FIRST.txt (Quick navigation)
+
+Reference:
+├── CHANGELOG.md (Version history)
+├── INDEX.md (Documentation index)
+├── PROJECT_SUMMARY.md (Project overview)
+└── DOCUMENTATION_COMPLETE.txt (Summary)
+
+Utilities:
+└── VIEW_DOCS.bat (Documentation viewer)
+
+==============================================================================
+                        🚀 QUICK ACCESS:
+==============================================================================
+
+Option 1: Navigate to folder
+    → Open: /docs/ folder
+    → Read: README.md or START_HERE.md
+
+Option 2: Use the viewer
+    → Run: /docs/VIEW_DOCS.bat
+    → Choose document from menu
+
+Option 3: Direct links
+    → Main docs: /docs/README.md
+    → Roblox guide: /docs/ROBLOX_2025_GUIDE.md
+    → Navigation: /docs/INDEX.md
+
+==============================================================================
+                        📊 WHAT STAYED IN MAIN FOLDER:
+==============================================================================
+
+These files remain in the main project folder:
+
+Application Files:
+├── ByGoneSpoofer_GUI.py
+├── ByGoneSpoofer.py
+└── bygone_system_info_collector.py
+
+Compilation Scripts:
+├── compile_bygone_gui.bat
+├── compile_bygone_spoofer.bat
+└── compile_system_info_collector.bat
+
+Quick Start Guides:
+├── QUICK_START_GUI.txt ⭐
+├── START_HERE.txt ⭐
+└── GUI_README.txt
+
+Configuration:
+├── ByGoneSpoofer.spec
+├── ByGoneSpoofer_GUI.spec
+└── requirements_gui.txt
+
+Other:
+├── COMPILATION_README.txt
+├── WHATS_NEW_v4.4.txt
+├── SYSTEM_INFO_COLLECTOR_README.txt
+└── ico.ico
+
+==============================================================================
+                        💡 RECOMMENDED READING ORDER:
+==============================================================================
+
+1. Quick Start Guides (Main Folder):
+   → QUICK_START_GUI.txt or START_HERE.txt
+
+2. Main Documentation (/docs/ folder):
+   → README.md (complete guide)
+   → ROBLOX_2025_GUIDE.md (for Roblox bans)
+
+3. Reference (/docs/ folder):
+   → INDEX.md (if you need help navigating)
+   → CHANGELOG.md (version history)
+
+==============================================================================
+                        📂 FOLDER STRUCTURE:
+==============================================================================
+
+PyCharmMiscProject/
+│
+├── docs/ ← DOCUMENTATION IS HERE!
+│   ├── README.md ⭐
+│   ├── ROBLOX_2025_GUIDE.md ⭐
+│   ├── CHANGELOG.md
+│   ├── INDEX.md
+│   ├── PROJECT_SUMMARY.md
+│   ├── READ_ME_FIRST.txt
+│   ├── DOCUMENTATION_COMPLETE.txt
+│   ├── VIEW_DOCS.bat
+│   └── START_HERE.md
+│
+├── ByGoneSpoofer_GUI.py
+├── ByGoneSpoofer.py
+├── QUICK_START_GUI.txt ⭐
+├── START_HERE.txt ⭐
+├── compile_bygone_gui.bat
+├── compile_bygone_spoofer.bat
+└── ... (other project files)
+
+==============================================================================
+                        🎯 WHAT TO DO NOW:
+==============================================================================
+
+1. Open the /docs/ folder
+2. Start with README.md or START_HERE.md
+3. If using for Roblox, read ROBLOX_2025_GUIDE.md
+4. Join discord.gg/bygone for support
+
+==============================================================================
+
+                    📚 All documentation is in /docs/ 📚
+
+==============================================================================
+

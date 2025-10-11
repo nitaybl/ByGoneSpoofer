@@ -1,0 +1,243 @@
+================================================================================
+ByGone System Info Collector - CHANGELOG
+================================================================================
+
+VERSION 1.1 - ENHANCED REPORT GENERATION
+--------------------------------------------------------------------------------
+
+WHAT WAS FIXED:
+---------------
+
+The text report was showing incomplete/raw data. Now it's fully parsed and 
+human-readable!
+
+IMPROVEMENTS:
+
+1. ✓ CPU Information Now Shows Properly
+   Before: "Name=AMD Ryzen 5 3600X 6-Core Processor"
+   After:  "Processor: AMD Ryzen 5 3600X 6-Core Processor"
+           "Physical Cores: 6"
+           "Logical Processors: 12"
+
+2. ✓ Network Adapters Now Show Completely
+   Before: Empty section (showed nothing!)
+   After:  Full list with:
+           - Adapter names
+           - Connection names
+           - MAC addresses
+           - Index numbers
+           - WiFi adapter warnings
+
+3. ✓ GPU Information Parsed
+   Before: "Name=NVIDIA GeForce GTX 1660 SUPER"
+   After:  "GPU: NVIDIA GeForce GTX 1660 SUPER"
+           "Driver Version: 32.0.15.8142"
+
+4. ✓ Memory Shows in GB
+   Before: "TotalPhysicalMemory=17096302592"
+   After:  "Total RAM: 15.92 GB"
+
+5. ✓ Motherboard Info Enhanced
+   Before: Raw WMIC output
+   After:  "Manufacturer: Gigabyte Technology Co., Ltd."
+           "Model: Z790 AORUS ELITE AX"
+           "Version: 1.0"
+           "BIOS Version: FHc"
+           "Is Asus: False"
+
+6. ✓ WiFi Status Section Added
+   Shows if user has wireless adapters
+
+7. ✓ Roblox Status Section Added
+   Shows:
+   - If Roblox is installed
+   - If Roblox processes are running
+
+8. ✓ Better Issue Detection Display
+   Shows "NO ISSUES DETECTED" if system is healthy
+
+================================================================================
+EXAMPLE OUTPUT (NEW FORMAT)
+================================================================================
+
+================================================================================
+ByGone Spoofer - System Information Report
+================================================================================
+
+Generated: 2025-10-12 00:53:52
+Computer: DESKTOP-C9GZEI
+Running as Admin: 1
+
+--------------------------------------------------------------------------------
+SYSTEM INFORMATION
+--------------------------------------------------------------------------------
+OS: Windows 11
+Version: 10.0.26200
+Architecture: AMD64
+Processor: AMD64 Family 23 Model 113 Stepping 0, AuthenticAMD
+
+--------------------------------------------------------------------------------
+CPU INFORMATION
+--------------------------------------------------------------------------------
+Processor: AMD Ryzen 5 3600X 6-Core Processor
+Physical Cores: 6
+Logical Processors: 12
+
+--------------------------------------------------------------------------------
+MOTHERBOARD INFORMATION
+--------------------------------------------------------------------------------
+Manufacturer: Gigabyte Technology Co., Ltd.
+Model: Z790 AORUS ELITE AX
+Version: 1.0
+BIOS Version: FHc
+Is Asus: False
+
+--------------------------------------------------------------------------------
+GPU INFORMATION
+--------------------------------------------------------------------------------
+GPU: NVIDIA GeForce GTX 1660 SUPER
+Driver Version: 32.0.15.8142
+
+--------------------------------------------------------------------------------
+MEMORY INFORMATION
+--------------------------------------------------------------------------------
+Total RAM: 15.92 GB
+
+--------------------------------------------------------------------------------
+NETWORK ADAPTERS
+--------------------------------------------------------------------------------
+[1] OpenVPN Data Channel Offload
+    Connection: OpenVPN Data Channel Offload for NordVPN
+    MAC Address: (None/Virtual)
+    Index: 0
+
+[2] Phantom TAP-Windows Adapter V9
+    Connection: Local Area Connection
+    MAC Address: 00:FF:AE:5E:12:D9
+    Index: 1
+
+[3] HotspotShield TAP-Windows Adapter V9
+    Connection: HotspotShield Network Adapter
+    MAC Address: 02:69:2E:83:0C:C5
+    Index: 2
+
+[4] Realtek PCIe GbE Family Controller
+    Connection: Ethernet
+    MAC Address: 02:59:BB:CE:73:4C
+    Index: 7
+
+[5] VMware Virtual Ethernet Adapter for VMnet1
+    Connection: VMware Network Adapter VMnet1
+    MAC Address: 00:50:56:C0:00:01
+    Index: 8
+
+... and more ...
+
+--------------------------------------------------------------------------------
+WIFI STATUS
+--------------------------------------------------------------------------------
+No wireless interfaces detected.
+
+--------------------------------------------------------------------------------
+✓ NO ISSUES DETECTED
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+ROBLOX STATUS
+--------------------------------------------------------------------------------
+✓ Roblox is installed
+⚠️  5 Roblox process(es) currently running:
+    Roblox Account Manager.ex     4596 Console                 
+    RobloxPlayerBeta.exe         41540 Console                 
+    RobloxCrashHandler.exe       28072 Console                 
+
+--------------------------------------------------------------------------------
+For complete details, see the JSON file.
+--------------------------------------------------------------------------------
+
+================================================================================
+TECHNICAL DETAILS
+================================================================================
+
+What Changed in the Code:
+--------------------------
+
+1. Added parse_wmic_value() function
+   - Extracts "Value" from "Key=Value" format
+   - Makes output human-readable
+
+2. Completely rewrote generate_report() function
+   - Now parses all WMIC output
+   - Formats everything nicely
+   - Shows detailed network adapter info
+   - Adds WiFi and Roblox status sections
+   - Better issue display
+
+3. Enhanced CSV parsing
+   - Network adapters are now parsed from CSV format
+   - Shows MAC addresses, connection names, indices
+   - Automatically flags WiFi adapters
+
+4. Version bumped to v1.1
+
+================================================================================
+HOW TO USE THE UPDATED VERSION
+================================================================================
+
+1. Compile the new version:
+   - Run: compile_system_info_collector.bat
+   - Or manually: pyinstaller bygone_system_info_collector.spec
+
+2. Distribute to users
+
+3. Users run it and send you BOTH files:
+   - bygone_system_info_YYYYMMDD_HHMMSS.json (complete raw data)
+   - bygone_system_info_YYYYMMDD_HHMMSS.txt (human-readable report)
+
+4. Open the TXT file first - it's now MUCH more readable!
+
+5. Check JSON if you need raw details
+
+================================================================================
+DEBUGGING WITH THE NEW FORMAT
+================================================================================
+
+Now you can instantly see:
+
+✓ What CPU the user has
+✓ All their network adapters with MACs
+✓ If they have WiFi (which may not support MAC spoofing)
+✓ If they have ASUS motherboard (HWID restrictions)
+✓ GPU model and driver version (graphics issues)
+✓ How much RAM they have
+✓ If Roblox is installed and running
+
+Makes debugging MUCH faster!
+
+================================================================================
+VERSION HISTORY
+================================================================================
+
+v1.0 - Initial Release
+- Collected all data
+- Output was raw WMIC format
+- Hard to read text reports
+
+v1.1 - Enhanced Report (CURRENT)
+- Parses all WMIC output
+- Human-readable text reports
+- Shows network adapters properly
+- Added WiFi and Roblox status sections
+- Better formatting overall
+
+================================================================================
+                        READY TO COMPILE!
+================================================================================
+
+The updated script is ready. Just run:
+    compile_system_info_collector.bat
+
+The new EXE will generate much better reports!
+
+================================================================================
+

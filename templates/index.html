@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eclipsebane Spoofer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #7aa2f7, 0 0 10px #7aa2f7; }
+            to { text-shadow: 0 0 10px #7aa2f7, 0 0 20px #7aa2f7; }
+        }
+        body { background-color: #1a1b26; color: #c0caf5; font-family: 'Inter', sans-serif; }
+        .main-container { background-color: #24283b; border: 1px solid #414868; }
+        .left-panel { border-right: 1px solid #414868; }
+        .info-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2f4166; }
+        .info-label { color: #a9b1d6; }
+        .info-value { color: #c0caf5; font-family: monospace; }
+        .toggle-switch-label:hover span.label-text { animation: glow 1.5s ease-in-out infinite alternate; }
+        .toggle-switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #414868; transition: .4s; border-radius: 28px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: #c0caf5; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #7aa2f7; }
+        input:checked + .slider:before { transform: translateX(22px); }
+        .action-button { background-color: #7aa2f7; color: #1a1b26; transition: all 0.3s; }
+        .action-button:hover { background-color: #9ece6a; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .action-button:disabled { background-color: #414868; cursor: not-allowed; transform: none; box-shadow: none; }
+        .log-panel { background-color: #16161e; border: 1px solid #414868; height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; color: #a9b1d6; }
+        .log-panel pre { white-space: pre-wrap; word-wrap: break-word; margin: 0; padding: 2px 4px;}
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="flex items-center justify-center h-screen p-4">
+
+    <div class="main-container w-full max-w-4xl rounded-xl shadow-2xl flex flex-col md:flex-row">
+        <div class="left-panel w-full md:w-1/3 p-6 space-y-4">
+            <h2 class="text-lg font-bold">Current Serials</h2>
+            <div id="info-container" class="space-y-2 text-sm">
+                <div class="info-item"><span class="info-label">HWID:</span><span class="info-value">Loading...</span></div>
+                <div class="info-item"><span class="info-label">BIOS:</span><span class="info-value">Loading...</span></div>
+                <div class="info-item"><span class="info-label">Baseboard:</span><span class="info-value">Loading...</span></div>
+                <div class="info-item"><span class="info-label">CPU:</span><span class="info-value">Loading...</span></div>
+                <div class="info-item"><span class="info-label">Disk:</span><span class="info-value">Loading...</span></div>
+                <div class="info-item"><span class="info-label">MAC:</span><span class="info-value">Loading...</span></div>
+            </div>
+        </div>
+
+        <div class="w-full md:w-2/3 p-6 flex flex-col">
+            <h1 class="text-xl font-bold mb-4">Eclipsebane</h1>
+            <div class="flex-grow space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label class="toggle-switch-label flex justify-between items-center bg-gray-900/30 p-3 rounded-lg"><span class="font-semibold label-text">Traces Deletion</span><div class="toggle-switch"><input type="checkbox" id="check-traces"><span class="slider"></span></div></label>
+                    <label class="toggle-switch-label flex justify-between items-center bg-gray-900/30 p-3 rounded-lg"><span class="font-semibold label-text">Serial Spoof</span><div class="toggle-switch"><input type="checkbox" id="check-serials"><span class="slider"></span></div></label>
+                    <label class="toggle-switch-label flex justify-between items-center bg-gray-900/30 p-3 rounded-lg"><span class="font-semibold label-text">Network Spoof</span><div class="toggle-switch"><input type="checkbox" id="check-network"><span class="slider"></span></div></label>
+                    <label class="toggle-switch-label flex justify-between items-center bg-gray-900/30 p-3 rounded-lg"><span class="font-semibold label-text">Roblox Reinstall</span><div class="toggle-switch"><input type="checkbox" id="check-reinstall"><span class="slider"></span></div></label>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h3 class="font-semibold mb-2">Logs</h3>
+                <div id="log-panel" class="log-panel p-2 rounded-lg"><pre>Waiting for operations to start...</pre></div>
+            </div>
+
+            <div class="flex justify-end space-x-4 mt-6">
+                <button id="refresh-button" class="action-button font-bold py-2 px-6 rounded-lg">Refresh Serials</button>
+                <button id="spoof-button" class="action-button font-bold py-2 px-6 rounded-lg">Spoof</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const spoofButton = document.getElementById('spoof-button');
+            const refreshButton = document.getElementById('refresh-button');
+            const logPanel = document.getElementById('log-panel');
+            const infoContainer = document.getElementById('info-container');
+
+            const fetchInfo = () => {
+                infoContainer.innerHTML = '<pre>Loading...</pre>';
+                // When running with pywebview, you can still fetch from Flask endpoints
+                // as Flask runs in the background. The URL will be the local Flask server.
+                fetch('/info')
+                    .then(response => response.json())
+                    .then(data => {
+                        infoContainer.innerHTML = `
+                            <div class="info-item"><span class="info-label">HWID:</span><span class="info-value">${data.hwid}</span></div>
+                            <div class="info-item"><span class="info-label">BIOS:</span><span class="info-value">${data.bios}</span></div>
+                            <div class="info-item"><span class="info-label">Baseboard:</span><span class="info-value">${data.baseboard}</span></div>
+                            <div class="info-item"><span class="info-label">CPU:</span><span class="info-value">${data.cpu}</span></div>
+                            <div class="info-item"><span class="info-label">Disk:</span><span class="info-value">${data.disk}</span></div>
+                            <div class="info-item"><span class="info-label">MAC:</span><span class="info-value">${data.mac}</span></div>
+                        `;
+                    })
+                    .catch(error => {
+                        infoContainer.innerHTML = '<pre>Error loading info.</pre>';
+                        console.error('Error fetching system info:', error)
+                    });
+            };
+
+            refreshButton.addEventListener('click', fetchInfo);
+
+            spoofButton.addEventListener('click', function() {
+                spoofButton.disabled = true;
+                refreshButton.disabled = true;
+                spoofButton.textContent = 'Spoofing...';
+                logPanel.innerHTML = '<pre>Starting spoofing process...</pre>';
+
+                const options = {
+                    traces: document.getElementById('check-traces').checked,
+                    serials: document.getElementById('check-serials').checked,
+                    network: document.getElementById('check-network').checked,
+                    reinstall: document.getElementById('check-reinstall').checked
+                };
+
+                // Send spoof request
+                fetch('/spoof', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(options)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Spoofing initiated:", data.status);
+                })
+                .catch(error => {
+                    console.error("Error initiating spoof:", error);
+                    spoofButton.disabled = false;
+                    refreshButton.disabled = false;
+                    spoofButton.textContent = 'Spoof';
+                });
+
+                // Start listening for logs from the Python backend
+                // In pywebview, we can use a direct JavaScript bridge rather than EventSource
+                // But EventSource still works if Flask is running. Let's keep it simple for now.
+                const eventSource = new EventSource('/stream');
+                eventSource.onmessage = function(event) {
+                    if (event.data === '___END___') {
+                        eventSource.close();
+                        spoofButton.disabled = false;
+                        refreshButton.disabled = false;
+                        spoofButton.textContent = 'Spoof';
+                        logPanel.innerHTML += '<pre>\\n--- Operation Finished ---</pre>';
+                        fetchInfo(); // Refresh info after spoofing
+                        return;
+                    }
+                    const pre = document.createElement('pre');
+                    pre.textContent = event.data;
+                    logPanel.appendChild(pre);
+                    logPanel.scrollTop = logPanel.scrollHeight;
+                };
+
+                eventSource.onerror = function(err) {
+                    console.error("EventSource failed:", err);
+                    eventSource.close();
+                    spoofButton.disabled = false;
+                    refreshButton.disabled = false;
+                    spoofButton.textContent = 'Spoof';
+                    logPanel.innerHTML += '<pre>\\n--- Log stream ended unexpectedly ---</pre>';
+                };
+            });
+
+            // Initial fetch
+            fetchInfo();
+        });
+    </script>
+</body>
+</html>
