@@ -148,11 +148,11 @@ except ImportError:
 AMIDEWIN_DIR_HWID = r"C:\Windows\Fonts"  # Consider a less sensitive directory like %TEMP%\AmideWinTools
 AMIDEWIN_TOOLS_MAP = {
     os.path.join(AMIDEWIN_DIR_HWID,
-                 "AMIDEWINx64.EXE"): "https://github.com/xxdotdos/amidewinpast/raw/main/AMIDEWINx64.EXE",
+                 "AMIDEWINx64.EXE"): "https://raw.githubusercontent.com/nitaybl/ByGoneSpoofer/refs/heads/main/AMIDEWINx64.EXE",
     os.path.join(AMIDEWIN_DIR_HWID,
-                 "amigendrv64.sys"): "https://github.com/xxdotdos/amidewinpast/raw/main/amigendrv64.sys",
+                 "amigendrv64.sys"): "https://raw.githubusercontent.com/nitaybl/ByGoneSpoofer/refs/heads/main/amigendrv64.sys",
     os.path.join(AMIDEWIN_DIR_HWID,
-                 "amifldrv64.sys"): "https://github.com/xxdotdos/amidewinpast/raw/main/amifldrv64.sys",
+                 "amifldrv64.sys"): "https://raw.githubusercontent.com/nitaybl/ByGoneSpoofer/refs/heads/main/amifldrv64.sys",
 }
 AMIDEWIN_FILES_TO_DELETE = [
     os.path.join(AMIDEWIN_DIR_HWID, "AMIDEWINx64.EXE"),
