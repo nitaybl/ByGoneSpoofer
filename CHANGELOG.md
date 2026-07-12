@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.5.0] - 2026-07-12
+
+### Added
+
+- **FishStrap / BloxStrap installer support** — When reinstalling Roblox, users can now choose between:
+  - Standard Roblox (official installer)
+  - FishStrap (custom bootstrapper via fishstrap.app)
+  - BloxStrap (custom bootstrapper auto-downloaded from GitHub)
+- **Download progress bar** for Roblox/BloxStrap installer downloads
+- **Skip installation option** — Users can now choose to skip the Roblox reinstall step
+
+### Fixed
+
+- **Compilation script fixes** (reported by [@echohumm](https://github.com/echohumm)):
+  - Fixed LF line endings → CRLF for Windows compatibility
+  - Fixed path assumptions — script now navigates to project root from `scripts/` directory
+  - Fixed `pyinstaller` not on PATH — now uses `python -m PyInstaller`
+  - Fixed `echo [>]` creating a stray `]` file — now properly escaped with `[^>]`
+  - Fixed `pip` commands → `python -m pip` for reliability
+- **Updated Discord link** to new server: discord.gg/3aZX4TukBC
+
+### Changed
+
+- Refactored `install_roblox()` into modular functions (`_install_standard_roblox()`, `_install_via_fishstrap()`, `_install_via_bloxstrap()`, `_wait_for_roblox_install()`)
+- Added shared `_download_file_with_progress()` helper with progress bar support
+- Updated version string to v4.5
+
+### Contributors
+
+- [@echohumm](https://github.com/echohumm) — Identified and documented all 4 compilation script issues
+
+---
+
 ## [4.4.0] - 2025-10-11
 
 ### Added
@@ -163,4 +196,3 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-

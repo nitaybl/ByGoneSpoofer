@@ -10,6 +10,11 @@ echo.
 echo ================================================================================
 echo.
 
+REM Navigate to the project root (one level up from scripts/)
+cd /d "%~dp0.."
+echo [+] Working directory: %CD%
+echo.
+
 echo [+] Starting ByGone Spoofer compilation process...
 echo.
 
@@ -28,7 +33,7 @@ echo.
 REM Check if ByGoneSpoofer.py exists
 echo [+] Checking if ByGoneSpoofer.py exists...
 if not exist "ByGoneSpoofer.py" (
-    echo [!] ERROR: ByGoneSpoofer.py not found in current directory!
+    echo [!] ERROR: ByGoneSpoofer.py not found in project root!
     echo [!] Current directory: %CD%
     pause
     exit /b 1
@@ -38,8 +43,8 @@ echo.
 
 REM Check if spec file exists
 echo [+] Checking if ByGoneSpoofer.spec exists...
-if not exist "ByGoneSpoofer.spec" (
-    echo [!] ERROR: ByGoneSpoofer.spec not found!
+if not exist "scripts\ByGoneSpoofer.spec" (
+    echo [!] ERROR: scripts\ByGoneSpoofer.spec not found!
     pause
     exit /b 1
 )
@@ -58,10 +63,10 @@ if not exist "ico.ico" (
 
 REM Install/Check PyInstaller
 echo [+] Checking PyInstaller installation...
-pip show pyinstaller >nul 2>&1
+python -m PyInstaller --version >nul 2>&1
 if errorlevel 1 (
     echo [!] PyInstaller not found. Installing...
-    pip install pyinstaller
+    python -m pip install pyinstaller
     if errorlevel 1 (
         echo [!] ERROR: Failed to install PyInstaller!
         pause
@@ -76,22 +81,22 @@ echo.
 REM Install/Check required dependencies
 echo [+] Checking required dependencies...
 echo [+] Installing/verifying colorama...
-pip install colorama --quiet
+python -m pip install colorama --quiet
 echo [+] Installing/verifying requests...
-pip install requests --quiet
+python -m pip install requests --quiet
 echo [+] Installing/verifying pywin32...
-pip install pywin32 --quiet
+python -m pip install pywin32 --quiet
 echo [✓] All dependencies verified
 echo.
 
 REM Clean previous builds
 echo [+] Cleaning previous build files...
 if exist "build" (
-    echo [>] Removing old build directory...
+    echo [^>] Removing old build directory...
     rmdir /s /q build 2>nul
 )
 if exist "dist\ByGoneSpoofer.exe" (
-    echo [>] Removing old ByGoneSpoofer.exe...
+    echo [^>] Removing old ByGoneSpoofer.exe...
     del /f /q dist\ByGoneSpoofer.exe 2>nul
 )
 echo [✓] Cleanup complete
@@ -101,12 +106,12 @@ echo ===========================================================================
 echo                          STARTING COMPILATION
 echo ================================================================================
 echo.
-echo [>] Compiling ByGoneSpoofer.py with ADMIN RIGHTS enabled...
-echo [>] This may take 1-3 minutes. Please wait...
+echo [^>] Compiling ByGoneSpoofer.py with ADMIN RIGHTS enabled...
+echo [^>] This may take 1-3 minutes. Please wait...
 echo.
 
-REM Run PyInstaller with the spec file
-pyinstaller --clean --noconfirm ByGoneSpoofer.spec
+REM Run PyInstaller with the spec file (using python -m to avoid PATH issues)
+python -m PyInstaller --clean --noconfirm scripts\ByGoneSpoofer.spec
 
 REM Check if compilation was successful
 if errorlevel 1 (
@@ -171,9 +176,8 @@ echo       - Right-click the EXE ^> Properties ^> Compatibility
 echo       - Check "Run this program as an administrator"
 echo.
 echo ================================================================================
-echo                    Join discord.gg/bygone for support!
+echo                    Join discord.gg/3aZX4TukBC for support!
 echo ================================================================================
 echo.
 
 pause
-

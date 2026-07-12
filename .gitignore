@@ -1,72 +1,55 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
 
-# Virtual Environment
-.venv/
-venv/
-ENV/
-env/
-
-# IDE
-.idea/
+# Visual Studio cache/options
+.vs/
 .vscode/
-*.swp
-*.swo
-*~
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
 
-# OS
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Project Specific
-*.spec
+# .NET
+*.dll
 *.exe
-*.log
-bygone_operations.log
-ByGoneHardwareBackup.json
+*.pdb
+*.cache
+*.nupkg
+*.snk
+project.lock.json
+project.fragment.lock.json
+artifacts/
 
-# Temporary files
-*.tmp
-*.temp
-~*
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
 
-# Build artifacts
-dist/
-build/
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Windows
-$RECYCLE.BIN/
-*.lnk
-
-# Backup files
-*.bak
-*.backup
+# Rider
+.idea/
+*.sln.iml
 
 # User-specific files
-test_*.py
-debug_*.py
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
 
+# Backup files
+*.backup
+*.bak
+*~

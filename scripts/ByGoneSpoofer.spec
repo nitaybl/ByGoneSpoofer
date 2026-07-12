@@ -1,10 +1,15 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
 
 block_cipher = None
 
+# SPECPATH is the directory containing this .spec file (scripts/)
+# The main .py file is one directory up (project root)
+project_root = os.path.join(SPECPATH, '..')
+
 a = Analysis(
-    ['ByGoneSpoofer.py'],
-    pathex=[],
+    [os.path.join(project_root, 'ByGoneSpoofer.py')],
+    pathex=[project_root],
     binaries=[],
     datas=[],
     hiddenimports=['win32security', 'win32api'],
@@ -41,5 +46,5 @@ exe = EXE(
     entitlements_file=None,
     uac_admin=True,
     uac_uiaccess=False,
-    icon='ico.ico',
+    icon=os.path.join(project_root, 'ico.ico'),
 )

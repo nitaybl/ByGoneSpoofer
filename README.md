@@ -13,6 +13,7 @@ Hardware identifier spoofing tool for Windows.
 - **EDID Spoofing** - Modify monitor serials
 - **Trace Removal** - Clean registry, event logs, temp files
 - **Backup & Restore** - Save and restore original hardware IDs
+- **FishStrap / BloxStrap Support** - Choose your preferred Roblox bootstrapper on reinstall
 
 ## Quick Start
 
@@ -35,8 +36,7 @@ python ByGoneSpoofer.py
 To create a standalone executable:
 
 ```bash
-cd scripts
-compile_bygone_spoofer.bat
+scripts\compile_bygone_spoofer.bat
 ```
 
 The EXE will be in the `dist/` folder.
@@ -49,6 +49,13 @@ The EXE will be in the `dist/` folder.
 | **Light Spoof** | Soft ban | MAC + EDID + Traces |
 | **Recommended** | Continue cheating | Traces + MAC (no HWID) |
 | **Reverse** | Undo changes | Restore from backup |
+
+## Roblox Install Options
+
+When reinstalling Roblox, you can choose:
+- **Standard Roblox** — Official installer from roblox.com
+- **FishStrap** — Custom bootstrapper with extra features (via fishstrap.app)
+- **BloxStrap** — Custom bootstrapper auto-downloaded from GitHub
 
 ## Safety
 
@@ -85,11 +92,18 @@ ByGoneSpoofer/
 ├── README.md                 # This file
 ├── LICENSE                   # MIT License
 ├── CHANGELOG.md             # Version history
+├── ico.ico                   # Application icon
 └── scripts/                  # Compilation scripts
     ├── compile_bygone_spoofer.bat
-    ├── ByGoneSpoofer.spec
-    └── bygone_webview2_fixer.py
+    └── ByGoneSpoofer.spec
 ```
+
+## Contributors
+
+| Contributor | Contributions |
+|-------------|---------------|
+| [@nitaybl](https://github.com/nitaybl) | Creator & maintainer |
+| [@echohumm](https://github.com/echohumm) | Compilation script bug reports & fixes (line endings, path resolution, PyInstaller PATH, echo escaping) |
 
 ## Contributing
 
@@ -101,6 +115,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Support
 
+- **Discord:** [discord.gg/3aZX4TukBC](https://discord.gg/3aZX4TukBC)
 - **Issues:** Open an issue in this repository
 - **Documentation:** See code comments in `ByGoneSpoofer.py`
 

@@ -72,8 +72,8 @@ class UI:
           \______/                                                                          |__/
 """
         print(f"{Theme.PRIMARY}{banner_art}{Theme.RESET}")
-        title = "Nitaybl's ByGone Spoofer (join discord.gg/bygone)"
-        version = "Version: v4.4 (Safety Features + Enhanced Cleanup)"
+        title = "Nitaybl's ByGone Spoofer (join discord.gg/3aZX4TukBC)"
+        version = "Version: v4.5 (FishStrap/BloxStrap + Compilation Fixes)"
         line = UI.LINE_H * (UI.WIDTH - 2)
         print(f"{Theme.PRIMARY}{UI.CORNER_TL}{line}{UI.CORNER_TR}{Theme.RESET}")
         print(
@@ -954,26 +954,87 @@ def uninstall_roblox():
 
 
 # --- Roblox Install function ---
+def _download_file_with_progress(url, dest_path, label="Downloading"):
+    """Downloads a file from URL with progress display."""
+    try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+        with requests.get(url, stream=True, timeout=60, headers=headers, allow_redirects=True) as r:
+            r.raise_for_status()
+            total_size = int(r.headers.get('content-length', 0))
+            downloaded = 0
+            with open(dest_path, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    f.write(chunk)
+                    downloaded += len(chunk)
+                    if total_size > 0:
+                        UI.print_progress_bar(downloaded, total_size, prefix=label,
+                                              suffix=f'{downloaded // 1024 // 1024}MB', length=30, color=Theme.INFO)
+            if total_size > 0:
+                UI.print_progress_bar(total_size, total_size, prefix=label,
+                                      suffix='Done!'.ljust(10), length=30, color=Theme.SUCCESS)
+        return os.path.exists(dest_path) and os.path.getsize(dest_path) > 100000
+    except Exception as e:
+        UI.print_status(f"Download error: {e}", status='error')
+        return False
+
+
+def _get_bloxstrap_latest_url():
+    """Fetches the latest BloxStrap .exe download URL from GitHub API."""
+    api_url = "https://api.github.com/repos/bloxstraplabs/bloxstrap/releases/latest"
+    try:
+        headers = {'User-Agent': 'ByGoneSpoofer/4.5', 'Accept': 'application/vnd.github.v3+json'}
+        resp = requests.get(api_url, timeout=15, headers=headers)
+        resp.raise_for_status()
+        data = resp.json()
+        for asset in data.get('assets', []):
+            name = asset.get('name', '').lower()
+            if name.endswith('.exe'):
+                return asset['browser_download_url'], data.get('tag_name', 'latest')
+        UI.print_status("Could not find .exe in BloxStrap release assets.", status='error')
+        return None, None
+    except Exception as e:
+        UI.print_status(f"Failed to fetch BloxStrap release info: {e}", status='error')
+        return None, None
+
+
 def install_roblox():
     UI.print_header("Roblox Installation")
+
+    # --- Bootstrapper choice ---
+    UI.print_status("Choose how to install Roblox:", status='input')
+    print(f"        {Theme.BRIGHT}[1]{Theme.RESET} {Theme.SUCCESS}Standard Roblox{Theme.RESET} (official installer from roblox.com)")
+    print(f"        {Theme.BRIGHT}[2]{Theme.RESET} {Theme.PRIMARY}FishStrap{Theme.RESET} (custom bootstrapper — opens fishstrap.app)")
+    print(f"        {Theme.BRIGHT}[3]{Theme.RESET} {Theme.SECONDARY}BloxStrap{Theme.RESET} (custom bootstrapper — auto-downloads from GitHub)")
+    print(f"        {Theme.BRIGHT}[0]{Theme.RESET} {Theme.MUTED}Skip installation{Theme.RESET}")
+
+    choice = UI.get_input("Enter your choice (1/2/3/0)")
+
+    if choice == '0':
+        UI.print_status("Roblox installation skipped by user.", status='warning')
+        return
+    elif choice == '2':
+        _install_via_fishstrap()
+        return
+    elif choice == '3':
+        _install_via_bloxstrap()
+        return
+    else:
+        # Default to standard Roblox install (choice == '1' or invalid)
+        _install_standard_roblox()
+        return
+
+
+def _install_standard_roblox():
+    """Installs Roblox using the official installer from roblox.com."""
+    UI.print_status("Installing via Standard Roblox installer...", status='action')
     installer_url = "https://www.roblox.com/download/client"
     installer_filename = f"RobloxPlayerInstaller_{uuid.uuid4().hex[:8]}.exe"
     installer_path = os.path.join(os.environ.get('TEMP', '.'), installer_filename)
 
     UI.print_status("Starting Roblox download...", status='info')
-    downloaded = False
-    try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'}
-        with requests.get(installer_url, stream=True, timeout=30, headers=headers, allow_redirects=True) as r:
-            r.raise_for_status()
-            with open(installer_path, 'wb') as f:
-                for chunk in r.iter_content(chunk_size=8192): f.write(chunk)
-        if os.path.exists(installer_path) and os.path.getsize(installer_path) > 1000000:
-            downloaded = True
-            UI.print_status("Downloaded successfully.", status='success')
-    except requests.exceptions.RequestException as e_req:
-        UI.print_status(f"Download error: {e_req}", status='error')
+    downloaded = _download_file_with_progress(installer_url, installer_path, label='Roblox:')
 
     if not downloaded:
         UI.print_status("Could not download Roblox installer. Skipping install.", status='error')
@@ -987,6 +1048,69 @@ def install_roblox():
         UI.print_status(f"Failed to start installer: {e}", status='error')
         return
 
+    _wait_for_roblox_install()
+
+
+def _install_via_fishstrap():
+    """Opens the FishStrap download page so the user can install it."""
+    UI.print_status("Opening FishStrap download page...", status='action')
+    UI.print_status("FishStrap is a custom Roblox bootstrapper with extra features.", status='info')
+    UI.print_status("ℹ️  Download and run the installer from the website.", status='info', indent=2)
+
+    fishstrap_url = "https://www.fishstrap.app"
+    try:
+        os.startfile(fishstrap_url)
+        UI.print_status(f"Opened {fishstrap_url} in your browser.", status='success')
+        UI.print_status("Install FishStrap from the website, then launch Roblox through it.", status='info')
+    except Exception as e:
+        UI.print_status(f"Could not open browser: {e}", status='error')
+        UI.print_status(f"Please manually visit: {fishstrap_url}", status='info')
+
+    _wait_for_roblox_install()
+
+
+def _install_via_bloxstrap():
+    """Downloads and runs the latest BloxStrap release from GitHub."""
+    UI.print_status("Fetching latest BloxStrap release from GitHub...", status='action')
+
+    download_url, version_tag = _get_bloxstrap_latest_url()
+    if not download_url:
+        UI.print_status("Could not find BloxStrap download. Opening GitHub releases page instead...", status='warning')
+        try:
+            os.startfile("https://github.com/bloxstraplabs/bloxstrap/releases/latest")
+        except Exception:
+            pass
+        _wait_for_roblox_install()
+        return
+
+    UI.print_status(f"Found BloxStrap {version_tag}", status='success')
+    installer_filename = f"Bloxstrap_{version_tag}_{uuid.uuid4().hex[:6]}.exe"
+    installer_path = os.path.join(os.environ.get('TEMP', '.'), installer_filename)
+
+    downloaded = _download_file_with_progress(download_url, installer_path, label='BloxStrap:')
+    if not downloaded:
+        UI.print_status("BloxStrap download failed. Opening GitHub page instead...", status='error')
+        try:
+            os.startfile("https://github.com/bloxstraplabs/bloxstrap/releases/latest")
+        except Exception:
+            pass
+        _wait_for_roblox_install()
+        return
+
+    UI.print_status("Launching BloxStrap installer...", status='action')
+    try:
+        subprocess.Popen([installer_path], creationflags=subprocess.CREATE_NEW_CONSOLE)
+        UI.print_status("BloxStrap installer launched. Follow on-screen instructions.", status='success')
+        UI.print_status("BloxStrap will handle downloading and installing Roblox for you.", status='info')
+    except Exception as e:
+        UI.print_status(f"Failed to start BloxStrap: {e}", status='error')
+        return
+
+    _wait_for_roblox_install()
+
+
+def _wait_for_roblox_install():
+    """Shared wait-and-verify logic for all installer types."""
     UI.print_status("Waiting 45s for installation to proceed...", status='info')
     for i in range(45, 0, -1):
         print(f"\r    {Theme.MUTED}Waiting... {i}s remaining. ", end="")
@@ -1014,6 +1138,7 @@ def install_roblox():
     else:
         UI.print_status(
             "Roblox installation uncertain. The target directory may be missing or empty.", status='warning')
+
 
 
 # --- MAC Spoofer Functions ---
@@ -1464,7 +1589,7 @@ def perform_full_spoofing_operations():
     install_roblox()
 
     UI.print_header("All Operations Completed")
-    UI.print_status("Join Our Server At discord.gg/bygone and star the project pls i need to feed my kids",
+    UI.print_status("Join Our Server At discord.gg/3aZX4TukBC and star the project pls i need to feed my kids",
                     status='success')
     operation_logger.log("Completed Full Spoofing Operation", True)
     return True
@@ -1511,7 +1636,7 @@ def perform_light_spoofing_operations():
     install_roblox()
 
     UI.print_header("Light Spoof Operations Completed")
-    UI.print_status("Join Our Server At discord.gg/bygone and star the project pls i need to feed my kids",
+    UI.print_status("Join Our Server At discord.gg/3aZX4TukBC and star the project pls i need to feed my kids",
                     status='success')
     operation_logger.log("Completed Light Spoofing Operation", True)
     return True
@@ -1570,7 +1695,7 @@ def perform_recommended_spoof_for_cheating():
 
     UI.print_header("Recommended Spoof Completed")
     UI.print_status("✓ Traces deleted | ✓ MAC changed | ✓ Roblox reinstalled | ✗ HWID unchanged", status='success')
-    UI.print_status("Join Our Server At discord.gg/bygone", status='success')
+    UI.print_status("Join Our Server At discord.gg/3aZX4TukBC", status='success')
     operation_logger.log("Completed Recommended Spoof for Cheating", True)
     return True
 
@@ -1675,7 +1800,7 @@ def perform_reverse_spoofing():
     UI.print_status("✓ Network MACs reset | ✓ Roblox reinstalled", status='success')
     UI.print_status("⚠️  IMPORTANT: SMBIOS/HWID and EDID changes were NOT reversed!", status='error')
     UI.print_status("To fully reverse hardware changes, use a system restore point or BIOS reset.", status='warning')
-    UI.print_status("Join Our Server At discord.gg/bygone for support", status='info')
+    UI.print_status("Join Our Server At discord.gg/3aZX4TukBC for support", status='info')
     operation_logger.log("Completed Reverse Spoofing", True)
     return True
 
