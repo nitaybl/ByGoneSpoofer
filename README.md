@@ -7,10 +7,12 @@ Hardware identifier spoofing tool for Windows — built **specifically for Roblo
 [![Stars](https://img.shields.io/github/stars/nitaybl/ByGoneSpoofer?style=for-the-badge&logo=github&color=00b4d8)](https://github.com/nitaybl/ByGoneSpoofer/stargazers)
 [![Downloads](https://img.shields.io/github/downloads/nitaybl/ByGoneSpoofer/total?style=for-the-badge&logo=github&color=52b788)](https://github.com/nitaybl/ByGoneSpoofer/releases)
 [![Release](https://img.shields.io/github/v/release/nitaybl/ByGoneSpoofer?style=for-the-badge&color=9d4edd)](https://github.com/nitaybl/ByGoneSpoofer/releases/latest)
-[![License](https://img.shields.io/github/license/nitaybl/ByGoneSpoofer?style=for-the-badge&color=f77f00)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-f77f00?style=for-the-badge)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Us-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/3aZX4TukBC)
 
-**📖 [Installation](docs/getting-started/installation.md) · [Walkthrough](docs/usage/walkthrough.md) · [Spoofing Modes](docs/usage/spoofing-modes.md) · [Use a VPN](docs/guides/vpn.md) · [Troubleshooting](docs/troubleshooting.md)**
+<br>
+
+[![Read the Docs](https://img.shields.io/badge/📖_Read_the_Full_Docs-GitBook-3884FF?style=for-the-badge&logo=gitbook&logoColor=white)](https://bygonespoofer.gitbook.io/bygonespoofer-docs)
 
 </div>
 
@@ -20,13 +22,10 @@ Hardware identifier spoofing tool for Windows — built **specifically for Roblo
 
 ## 📚 Documentation
 
-**Full step-by-step docs (GitBook):** the [`docs/`](docs/README.md) folder covers
-everything below. Jump straight to a guide:
+**All guides live in the GitBook docs** — installation, a full spoof walkthrough,
+spoofing modes, VPN setup, Windows activation, troubleshooting, and warnings:
 
-- 🚀 [Installation](docs/getting-started/installation.md) · [First Run](docs/getting-started/first-run.md)
-- 📖 [Spoofing Modes](docs/usage/spoofing-modes.md) · [Full Walkthrough](docs/usage/walkthrough.md)
-- 🛡️ [Use a VPN (Warp)](docs/guides/vpn.md) · [Activating Windows](docs/guides/windows-activation.md)
-- ⚠️ [Hard Spoof Warning](docs/warnings/hard-spoof.md) · 🔧 [Troubleshooting](docs/troubleshooting.md)
+### 👉 [Read the documentation on GitBook](https://bygonespoofer.gitbook.io/bygonespoofer-docs)
 
 ## 👀 What it looks like
 
@@ -164,7 +163,7 @@ see [DISCLAIMER.md](DISCLAIMER.md).
 
 - **Discord:** [discord.gg/3aZX4TukBC](https://discord.gg/3aZX4TukBC)
 - **Issues:** Open an issue in this repository
-- **Documentation:** Full GitBook docs in the [`docs/`](docs/README.md) folder
+- **Documentation:** [bygonespoofer.gitbook.io](https://bygonespoofer.gitbook.io/bygonespoofer-docs)
 
 ---
 
