@@ -73,7 +73,7 @@ class UI:
 """
         print(f"{Theme.PRIMARY}{banner_art}{Theme.RESET}")
         title = "Nitaybl's ByGone Spoofer (join discord.gg/3aZX4TukBC)"
-        version = "Version: v4.6 (Connectivity Check + Wider Adapter Support)"
+        version = "Version: v4.7 (HWID Spoof/Restore Fixes + Roblox Path Detection)"
         line = UI.LINE_H * (UI.WIDTH - 2)
         print(f"{Theme.PRIMARY}{UI.CORNER_TL}{line}{UI.CORNER_TR}{Theme.RESET}")
         print(
@@ -165,7 +165,14 @@ REG_PATH_MAC_SPOOFER = r"HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e972-e
 HEX_CHARS_MAC_SPOOFER = "0123456789ABCDEF"
 
 # --- WebView2 Fixer Constants ---
-VERSIONS_ROOT = r"C:\Program Files (x86)\Roblox\Versions"
+# Roblox may live under either Program Files location or the per-user LocalAppData
+# folder depending on the installer/version, so check all of them.
+VERSIONS_ROOT_CANDIDATES = [
+    r"C:\Program Files (x86)\Roblox\Versions",
+    r"C:\Program Files\Roblox\Versions",
+    os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Roblox', 'Versions'),
+]
+VERSIONS_ROOT = VERSIONS_ROOT_CANDIDATES[0]  # kept for backward compatibility / messages
 
 
 # --- Utility Functions ---
@@ -528,54 +535,67 @@ def restore_from_backup():
         return False
 
 
+def get_amidewin_exe():
+    """
+    Return a path to AMIDEWINx64.EXE, downloading the toolset if needed.
+    Returns None if it cannot be obtained. (Replaces the previously-undefined
+    get_bundled_amidewin() that made HWID restore always fail.)
+    """
+    exe_path = os.path.join(AMIDEWIN_DIR_HWID, "AMIDEWINx64.EXE")
+    if os.path.exists(exe_path):
+        return exe_path
+    if download_amidewin_tools():
+        exe_path = os.path.join(AMIDEWIN_DIR_HWID, "AMIDEWINx64.EXE")
+        if os.path.exists(exe_path):
+            return exe_path
+    return None
+
+
+def _parse_wmic_kv(raw):
+    """Parse a single-record `wmic ... /format:csv` output into a {header: value} dict."""
+    if not raw:
+        return {}
+    rows = [r.strip() for r in raw.splitlines() if r.strip()]
+    if len(rows) < 2:
+        return {}
+    headers = [h.strip() for h in rows[0].split(',')]
+    values = [v.strip() for v in rows[1].split(',')]
+    return dict(zip(headers, values))
+
+
 def restore_hwid_from_backup(system_info):
     """Restores HWID/SMBIOS from saved system info using AMIDEWINx64."""
     try:
-        # Parse saved BIOS info
-        bios_data = system_info.get('bios', '')
-        baseboard_data = system_info.get('baseboard', '')
-        computersystem_data = system_info.get('computersystem', '')
-        
-        # Extract serial numbers from CSV format
-        def parse_wmic_line(data):
-            lines = data.split('\n')
-            if len(lines) >= 2:
-                headers = lines[0].split(',')
-                values = lines[1].split(',')
-                return dict(zip(headers, values))
-            return {}
-        
-        bios_info = parse_wmic_line(bios_data)
-        board_info = parse_wmic_line(baseboard_data)
-        system_uuid_info = parse_wmic_line(computersystem_data)
-        
-        # Use AMIDEWINx64 to restore original values
-        amidewin_path = get_bundled_amidewin()
+        bios_info = _parse_wmic_kv(system_info.get('bios', ''))
+        board_info = _parse_wmic_kv(system_info.get('baseboard', ''))
+        system_uuid_info = _parse_wmic_kv(system_info.get('computersystem', ''))
+
+        amidewin_path = get_amidewin_exe()
         if not amidewin_path:
-            UI.print_status("AMIDEWINx64 not found. Cannot restore HWID.", status='error')
+            UI.print_status("AMIDEWINx64 not available. Cannot restore HWID.", status='error')
             return False
-        
-        # Restore BIOS serial
-        if 'SerialNumber' in bios_info and bios_info['SerialNumber']:
-            cmd = f'"{amidewin_path}" /BS {bios_info["SerialNumber"]}'
-            _run_shell_command_simple(cmd, shell=True)
-            UI.print_status(f"✓ Restored BIOS serial", status='success', indent=2)
-        
-        # Restore Board serial
-        if 'SerialNumber' in board_info and board_info['SerialNumber']:
-            cmd = f'"{amidewin_path}" /SS {board_info["SerialNumber"]}'
-            _run_shell_command_simple(cmd, shell=True)
-            UI.print_status(f"✓ Restored Board serial", status='success', indent=2)
-        
-        # Restore System UUID
-        if 'UUID' in system_uuid_info and system_uuid_info['UUID']:
-            cmd = f'"{amidewin_path}" /SU {system_uuid_info["UUID"]}'
-            _run_shell_command_simple(cmd, shell=True)
-            UI.print_status(f"✓ Restored System UUID", status='success', indent=2)
-        
-        UI.print_status("HWID/SMBIOS restore complete", status='success')
+
+        def _apply(param, value, label):
+            if not value:
+                return
+            result = _run_shell_command_simple([amidewin_path, param, value], cwd=AMIDEWIN_DIR_HWID,
+                                               shell=False, capture_output_if_no_pipes=True, timeout=20)
+            if result and result.returncode == 0:
+                UI.print_status(f"✓ Restored {label}", status='success', indent=2)
+            else:
+                UI.print_status(f"Could not restore {label} (may be blocked by BIOS).",
+                                status='warning', indent=2)
+
+        # Win32_BIOS.SerialNumber is the SMBIOS *system* serial  -> /SS
+        # Win32_BaseBoard.SerialNumber is the baseboard serial    -> /BS
+        # Win32_ComputerSystemProduct.UUID is the system UUID     -> /SU
+        _apply("/SS", bios_info.get('SerialNumber', ''), "System serial")
+        _apply("/BS", board_info.get('SerialNumber', ''), "Baseboard serial")
+        _apply("/SU", system_uuid_info.get('UUID', ''), "System UUID")
+
+        UI.print_status("HWID/SMBIOS restore complete. Reboot required.", status='success')
         return True
-        
+
     except Exception as e:
         UI.print_status(f"Error restoring HWID: {e}", status='warning')
         return False
@@ -1291,6 +1311,14 @@ def generate_random_mac_enforce_02():
     return "02" + "".join(random.choice(HEX_CHARS_MAC_SPOOFER) for _ in range(10))
 
 
+def _random_hw_serial(length=None):
+    """Generate a random alphanumeric hardware serial (uppercase) for SMBIOS fields."""
+    if length is None:
+        length = random.randint(8, 12)
+    alphabet = string.ascii_uppercase + string.digits
+    return "".join(random.choice(alphabet) for _ in range(length))
+
+
 def ping_host(host="google.com", timeout_ms=3000):
     """
     Return True if `host` responds to a single ICMP echo request.
@@ -1629,7 +1657,15 @@ def spoof_smbios_with_amidewin_focused():
         UI.print_status("AMIDEWINx64.EXE not found. Skipping.", status='error')
         return False
 
-    ami_commands = {"/SU": "Auto"}
+    # AMIDEWIN expects a concrete value per field. The previous "/SU Auto" was not a
+    # valid AMIDEWIN argument, so the UUID never actually changed. Generate real random
+    # identifiers and pass them explicitly:
+    #   /SU = System UUID, /SS = System serial number, /BS = Baseboard serial number
+    ami_commands = {
+        "/SU": str(uuid.uuid4()).upper(),
+        "/SS": _random_hw_serial(),
+        "/BS": _random_hw_serial(),
+    }
     success_count = 0
     total_cmds = len(ami_commands)
     for i, (param, value) in enumerate(ami_commands.items()):
@@ -1637,12 +1673,18 @@ def spoof_smbios_with_amidewin_focused():
                               length=30, color=Theme.INFO)
         cmd_result = _run_shell_command_simple([exe_path, param, value], cwd=AMIDEWIN_DIR_HWID, shell=False,
                                                capture_output_if_no_pipes=True, timeout=20)
-        if cmd_result and cmd_result.returncode == 0: success_count += 1
+        if cmd_result and cmd_result.returncode == 0:
+            success_count += 1
+        elif cmd_result and cmd_result.stdout:
+            # Surface AMIDEWIN's own message so blocked/failed writes are diagnosable.
+            UI.print_status(cmd_result.stdout.strip().splitlines()[-1] if cmd_result.stdout.strip() else
+                            f"{param} returned code {cmd_result.returncode}", status='warning', indent=2)
     UI.print_progress_bar(total_cmds, total_cmds, prefix='SMBIOS Update:', suffix='Done!'.ljust(20), length=30,
                           color=Theme.SUCCESS)
     if success_count > 0:
-        UI.print_status("AMIDEWIN commands issued.", status='success')
-        operation_logger.log("SMBIOS Spoof", True)
+        UI.print_status(f"AMIDEWIN applied {success_count}/{total_cmds} SMBIOS change(s). Reboot required.",
+                        status='success')
+        operation_logger.log("SMBIOS Spoof", True, f"{success_count}/{total_cmds} fields")
         return True
     else:
         UI.print_status("No AMIDEWIN SMBIOS commands succeeded.", status='error')
@@ -1686,16 +1728,28 @@ def perform_focused_hwid_spoof():
 
 # --- WebView2 Fixer Functions (Integrated) ---
 def find_latest_version_dir() -> Path:
+    """
+    Find the newest Roblox 'version-*' folder, searching every known install
+    location (both Program Files paths and LocalAppData). Roblox is often under
+    'C:\\Program Files\\Roblox' rather than the (x86) path, so we try them all
+    and pick the most recently modified version folder across all of them.
+    """
     candidates = []
-    root = Path(VERSIONS_ROOT)
-    if not root.exists():
-        return None
-    for p in root.iterdir():
-        if p.is_dir() and p.name.startswith("version-"):
-            candidates.append((p.stat().st_mtime, p))
+    for root_str in VERSIONS_ROOT_CANDIDATES:
+        if not root_str:
+            continue
+        root = Path(root_str)
+        if not root.exists():
+            continue
+        try:
+            for p in root.iterdir():
+                if p.is_dir() and p.name.startswith("version-"):
+                    candidates.append((p.stat().st_mtime, p))
+        except OSError:
+            continue
     if not candidates:
         return None
-    candidates.sort(reverse=True)
+    candidates.sort(key=lambda c: c[0], reverse=True)
     return candidates[0][1]
 
 
@@ -1735,7 +1789,8 @@ def action_nuke_webview2():
 
     version_dir = find_latest_version_dir()
     if not version_dir:
-        UI.print_status(f"Could not find Roblox versions directory at '{VERSIONS_ROOT}'. Is Roblox installed?",
+        searched = ", ".join(r for r in VERSIONS_ROOT_CANDIDATES if r)
+        UI.print_status(f"Could not find a Roblox versions directory. Searched: {searched}. Is Roblox installed?",
                         status='error')
         return
 
