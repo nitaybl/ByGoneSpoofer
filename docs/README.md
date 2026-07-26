@@ -55,8 +55,8 @@ When you launch the tool you are greeted by this banner and the main menu:
 
 {% hint style="info" %}
 The screenshots above are text mock-ups of the real console. Want to swap in real
-screenshots? Drop PNG files into `docs/images/` and reference them — see
-[Setting Up GitBook](gitbook-setup.md).
+screenshots? Drop PNG files into `docs/images/` and reference them with
+`![Main menu](images/loader-menu.png)`.
 {% endhint %}
 
 ## ✨ Features

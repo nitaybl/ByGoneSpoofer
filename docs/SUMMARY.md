@@ -24,7 +24,3 @@
 ## 🔧 Help
 
 * [Troubleshooting](troubleshooting.md)
-
-## 🏗️ For Maintainers
-
-* [Setting Up GitBook](gitbook-setup.md)
