@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.8.0] - 2026-07-26
+
+### Added
+
+- **Built-in auto-updater.** On launch, ByGone Spoofer checks GitHub for a newer
+  release. If one is found it shows the new version's changelog and lets you choose to:
+  - **Install now** — downloads the new EXE and relaunches into it automatically
+    (a small batch script swaps the executable once the old one exits),
+  - **Remind me later** — you'll be asked again next launch, or
+  - **Skip this version** — you won't be prompted about that version again.
+  Running from source shows the release link instead of self-replacing. A failed or
+  offline check is silent and never blocks startup.
+
+### Changed
+
+- Centralized the version in a single `APP_VERSION` constant (used by the banner and
+  the updater) and bumped it to v4.8.0.
+
+---
+
 ## [4.7.0] - 2026-07-26
 
 ### Fixed
