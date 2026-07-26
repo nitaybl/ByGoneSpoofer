@@ -73,7 +73,7 @@ class UI:
 """
         print(f"{Theme.PRIMARY}{banner_art}{Theme.RESET}")
         title = "Nitaybl's ByGone Spoofer (join discord.gg/3aZX4TukBC)"
-        version = "Version: v4.5 (FishStrap/BloxStrap + Compilation Fixes)"
+        version = "Version: v4.6 (Connectivity Check + Wider Adapter Support)"
         line = UI.LINE_H * (UI.WIDTH - 2)
         print(f"{Theme.PRIMARY}{UI.CORNER_TL}{line}{UI.CORNER_TR}{Theme.RESET}")
         print(
@@ -1142,29 +1142,227 @@ def _wait_for_roblox_install():
 
 
 # --- MAC Spoofer Functions ---
-def get_available_nics_new():
+def _parse_nic_csv(stdout, name_col, index_col):
+    """
+    Parse CSV output from wmic or PowerShell ConvertTo-Csv into NIC dicts.
+    Column positions differ between the two tools, so callers pass the header
+    names to locate the right columns (locale/column-order tolerant).
+    Returns a list of {"name", "index"} dicts.
+    """
     nics = []
+    if not stdout:
+        return nics
+    lines = [ln for ln in stdout.splitlines() if ln.strip()]
+    if len(lines) < 2:
+        return nics
+    # Locate columns by header name (case-insensitive), fall back to fixed order.
+    header = [h.strip().strip('"').lower() for h in lines[0].split(',')]
     try:
-        cmd = 'wmic nic where "NetConnectionID is not null" get NetConnectionID, Index /format:csv'
-        process = _run_shell_command_simple(cmd, capture_output_if_no_pipes=True, text=True, shell=True)
-        if process and process.stdout:
-            lines = process.stdout.strip().splitlines()
-            if len(lines) > 1:
-                for line in lines[1:]:
-                    parts = line.strip().split(',')
-                    if len(parts) >= 3:
-                        nic_name = parts[2].strip()
-                        nic_index_str = parts[1].strip()
-                        if nic_name and nic_index_str.isdigit():
-                            if not any(n['name'] == nic_name for n in nics):
-                                nics.append({"name": nic_name, "index": nic_index_str})
-    except Exception as e:
-        UI.print_status(f"Error enumerating NICs: {e}", status='error')
+        name_idx = header.index(name_col.lower())
+        index_idx = header.index(index_col.lower())
+    except ValueError:
+        # wmic /format:csv prepends a Node column: Node,Index,NetConnectionID
+        name_idx, index_idx = 2, 1
+    for line in lines[1:]:
+        parts = [p.strip().strip('"') for p in line.split(',')]
+        if len(parts) <= max(name_idx, index_idx):
+            continue
+        nic_name = parts[name_idx].strip()
+        nic_index_str = parts[index_idx].strip()
+        if nic_name and nic_index_str.isdigit():
+            if not any(n['name'] == nic_name for n in nics):
+                nics.append({"name": nic_name, "index": nic_index_str})
     return nics
+
+
+def _get_nics_via_wmic():
+    """Adapter enumeration via WMIC (available on Windows 10 / older builds)."""
+    cmd = 'wmic nic where "NetConnectionID is not null" get NetConnectionID, Index /format:csv'
+    process = _run_shell_command_simple(cmd, capture_output_if_no_pipes=True, text=True, shell=True, timeout=20)
+    if process and process.stdout:
+        return _parse_nic_csv(process.stdout, "NetConnectionID", "Index")
+    return []
+
+
+def _get_nics_via_powershell():
+    """
+    Adapter enumeration via PowerShell CIM. Works on modern Windows 11 builds
+    where WMIC has been removed. Uses Win32_NetworkAdapter so the 'Index' field
+    keeps the same class-subkey semantics WMIC returns (required for the
+    NetworkAddress registry write).
+    """
+    ps_script = ("Get-CimInstance Win32_NetworkAdapter | "
+                 "Where-Object { $_.NetConnectionID } | "
+                 "Select-Object NetConnectionID,Index | "
+                 "ConvertTo-Csv -NoTypeInformation")
+    process = _run_shell_command_simple(
+        ["powershell", "-NoProfile", "-NonInteractive", "-Command", ps_script],
+        capture_output_if_no_pipes=True, text=True, shell=False, timeout=30)
+    if process and process.stdout:
+        return _parse_nic_csv(process.stdout, "NetConnectionID", "Index")
+    return []
+
+
+def _get_nics_via_registry():
+    """
+    Adapter enumeration by walking the network class key directly with winreg.
+    Fully offline last-resort fallback for when both wmic and PowerShell are
+    unavailable. The 4-digit class subkey ordinal (0000/0001/...) equals the
+    Win32_NetworkAdapter.Index, so it maps to the same registry path used for
+    MAC writes. The human-readable connection name is resolved from the Network
+    control key via the adapter's NetCfgInstanceId (GUID).
+    """
+    nics = []
+    class_subpath = r"SYSTEM\CurrentControlSet\Control\Class\{4d36e972-e325-11ce-bfc1-08002be10318}"
+    network_subpath = r"SYSTEM\CurrentControlSet\Control\Network\{4D36E972-E325-11CE-BFC1-08002BE10318}"
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, class_subpath) as class_key:
+            i = 0
+            while True:
+                try:
+                    sub_name = winreg.EnumKey(class_key, i)
+                except OSError:
+                    break
+                i += 1
+                if not (len(sub_name) == 4 and sub_name.isdigit()):
+                    continue
+                try:
+                    with winreg.OpenKey(class_key, sub_name) as nic_key:
+                        try:
+                            guid, _ = winreg.QueryValueEx(nic_key, "NetCfgInstanceId")
+                        except OSError:
+                            continue
+                        try:
+                            driver_desc, _ = winreg.QueryValueEx(nic_key, "DriverDesc")
+                        except OSError:
+                            driver_desc = None
+                        conn_name = _registry_connection_name(network_subpath, guid) or driver_desc
+                        if conn_name:
+                            index_str = str(int(sub_name))
+                            if not any(n['name'] == conn_name for n in nics):
+                                nics.append({"name": conn_name, "index": index_str})
+                except OSError:
+                    continue
+    except OSError:
+        pass
+    return nics
+
+
+def _registry_connection_name(network_subpath, guid):
+    """Resolve a NIC's connection name (NetConnectionID) from the Network key."""
+    try:
+        conn_path = rf"{network_subpath}\{guid}\Connection"
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, conn_path) as conn_key:
+            name, _ = winreg.QueryValueEx(conn_key, "Name")
+            return name
+    except OSError:
+        return None
+
+
+def get_available_nics_new():
+    """
+    Enumerate spoofable network adapters as [{"name", "index"}] dicts, where
+    'index' is the registry class-subkey ordinal used for the NetworkAddress
+    write. Tries multiple detection sources in order and stops at the first that
+    returns results, so adapters are found across a wide range of Windows builds
+    (older systems with WMIC, modern Windows 11 without it, and offline/locked
+    environments via the registry).
+    """
+    sources = (
+        ("WMIC", _get_nics_via_wmic),
+        ("PowerShell", _get_nics_via_powershell),
+        ("Registry", _get_nics_via_registry),
+    )
+    for source_name, resolver in sources:
+        try:
+            nics = resolver()
+        except Exception as e:
+            UI.print_status(f"NIC detection via {source_name} failed: {e}", status='warning', indent=2)
+            nics = []
+        if nics:
+            if source_name != "WMIC":
+                UI.print_status(f"Detected adapters via {source_name} fallback.", status='info', indent=2)
+            return nics
+    UI.print_status("No network adapters detected by any method.", status='warning', indent=2)
+    return []
 
 
 def generate_random_mac_enforce_02():
     return "02" + "".join(random.choice(HEX_CHARS_MAC_SPOOFER) for _ in range(10))
+
+
+def ping_host(host="google.com", timeout_ms=3000):
+    """
+    Return True if `host` responds to a single ICMP echo request.
+    Uses the Windows `ping` command (-n 1 one echo, -w timeout in ms).
+    """
+    result = _run_shell_command_simple(
+        f'ping -n 1 -w {timeout_ms} {host}',
+        shell=True, capture_output_if_no_pipes=True, text=True, timeout=(timeout_ms / 1000) + 5)
+    return bool(result and result.returncode == 0)
+
+
+def verify_connectivity_after_spoof(targets, host="google.com"):
+    """
+    Verify internet connectivity after a MAC spoof.
+
+    Waits 10s for the adapter to stabilise, then pings `host`. If there is no
+    response, it retries every 10s for up to 40s more (4 additional attempts)
+    before timing out. On timeout the user is warned and offered the choice to
+    restore the original MAC address(es) of the spoofed adapters or keep the
+    spoofed ones.
+
+    Returns True if connectivity was confirmed (before or after a restore),
+    False otherwise.
+    """
+    UI.print_header("Connectivity Check")
+    UI.print_status(f"Waiting 10s for network adapters to stabilize before pinging {host}...", status='info')
+    time.sleep(10)
+
+    if ping_host(host):
+        UI.print_status(f"Connectivity confirmed ({host} reachable).", status='success')
+        operation_logger.log("Post-spoof connectivity check", True, f"{host} reachable")
+        return True
+
+    # No response on the first ping: retry every 10s for up to 40s.
+    UI.print_status(f"No response from {host}. Retrying every 10s for up to 40s...", status='warning')
+    for elapsed in range(10, 41, 10):
+        UI.print_status(f"Rechecking connectivity... ({elapsed}s / 40s)", status='info', indent=2)
+        time.sleep(10)
+        if ping_host(host):
+            UI.print_status(f"Connectivity restored ({host} reachable after {elapsed}s).", status='success')
+            operation_logger.log("Post-spoof connectivity check", True, f"reachable after {elapsed}s")
+            return True
+
+    # Timed out with no connectivity.
+    UI.print_status(f"Connectivity check TIMED OUT after 40s. {host} is unreachable.", status='error')
+    UI.print_status("The new MAC address may be blocking your internet connection.", status='warning', indent=2)
+    operation_logger.log("Post-spoof connectivity check", False, f"{host} unreachable after timeout")
+
+    if not targets:
+        return False
+
+    choice = UI.get_input("Restore original MAC address(es) for the spoofed adapter(s)? (y/n)")
+    if choice == 'y':
+        UI.print_status("Restoring original MAC address(es)...", status='action')
+        restored = 0
+        for adapter in targets:
+            if restore_mac_for_adapter(adapter['name'], adapter['index']):
+                restored += 1
+        operation_logger.log("Restored MAC after connectivity failure", restored > 0, f"{restored} adapter(s)")
+        # Re-verify once after restoring.
+        UI.print_status("Rechecking connectivity after restore...", status='info')
+        time.sleep(5)
+        if ping_host(host):
+            UI.print_status("Connectivity restored after reverting MAC address(es).", status='success')
+            return True
+        UI.print_status("Still no connectivity. Try rebooting or reconnecting your network manually.",
+                        status='error')
+        return False
+    else:
+        UI.print_status("Keeping spoofed MAC. Warning: your internet may remain unavailable.", status='warning')
+        UI.print_status("You can revert later via the Reverse Spoof option.", status='info', indent=2)
+        return False
 
 
 def set_mac_address_new(nic_name, nic_index, mac_address_no_colons):
@@ -1239,6 +1437,8 @@ def change_mac_address_integrated():
             time.sleep(1)
         if changed_count > 0:
             UI.print_status(f"{changed_count} MAC address(es) spoofed.", status='success')
+            # Confirm the adapter came back online; offer restore on timeout.
+            verify_connectivity_after_spoof(targets)
     except Exception as e:
         UI.print_status(f"An error occurred during MAC spoofing: {e}", status='error')
 
@@ -1580,9 +1780,6 @@ def perform_full_spoofing_operations():
     delete_roblox_cookies()
     change_mac_address_integrated()
 
-    UI.print_status("Pausing 10s for network adapters to stabilize...", status='info')
-    time.sleep(10)
-
     modify_monitor_edids()
     manage_system_registry_keys()
     perform_focused_hwid_spoof()
@@ -1625,9 +1822,6 @@ def perform_light_spoofing_operations():
     delete_roblox_registry_keys()
     delete_roblox_cookies()
     change_mac_address_integrated()
-
-    UI.print_status("Pausing 10s for network adapters to stabilize...", status='info')
-    time.sleep(10)
 
     modify_monitor_edids()
     manage_system_registry_keys()
@@ -1683,9 +1877,6 @@ def perform_recommended_spoof_for_cheating():
     # Change MAC address
     change_mac_address_integrated()
 
-    UI.print_status("Pausing 10s for network adapters to stabilize...", status='info')
-    time.sleep(10)
-
     # Clean system registry but skip SMBIOS/HWID spoofing
     manage_system_registry_keys()
     UI.print_status("Skipping SMBIOS UUID and Hardware Serial spoofing (as recommended for cheating).", status='info')
@@ -1700,49 +1891,57 @@ def perform_recommended_spoof_for_cheating():
     return True
 
 
+def restore_mac_for_adapter(nic_name, nic_index):
+    """
+    Restore a single adapter's factory MAC by deleting its NetworkAddress
+    registry value and cycling the adapter. Returns True on success.
+    Shared by reset_network_adapters() and the post-spoof connectivity
+    restore-offer so both behave identically.
+    """
+    registry_key_path = rf"{REG_PATH_MAC_SPOOFER}\{nic_index.zfill(4)}"
+    try:
+        UI.print_status(f"Resetting MAC for: {nic_name}...", status='info', indent=2)
+
+        # Disable adapter
+        _run_shell_command_simple(f'netsh interface set interface name="{nic_name}" admin=disable',
+                                  shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                                  capture_output_if_no_pipes=False)
+        time.sleep(1)
+
+        # Delete the NetworkAddress value to restore default MAC
+        reg_delete_cmd = ["reg", "delete", registry_key_path, "/v", "NetworkAddress", "/f"]
+        _run_shell_command_simple(reg_delete_cmd, shell=False, capture_output_if_no_pipes=True)
+
+        # Enable adapter
+        _run_shell_command_simple(f'netsh interface set interface name="{nic_name}" admin=enable',
+                                  shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                                  capture_output_if_no_pipes=False)
+        time.sleep(2)
+
+        UI.print_status(f"Reset MAC for {nic_name} to default.", status='success', indent=2)
+        return True
+    except Exception as e:
+        UI.print_status(f"Could not reset {nic_name}: {e}", status='warning', indent=2)
+        return False
+
+
 def reset_network_adapters():
     """Attempts to reset network adapters to default state."""
     UI.print_status("Resetting network adapters...", status='action')
     if not is_admin():
         UI.print_status("Admin privileges required. Skipping.", status='error')
         return
-    
+
     adapters = get_available_nics_new()
     if not adapters:
         UI.print_status("No network adapters found.", status='warning')
         return
-    
+
     reset_count = 0
     for adapter in adapters:
-        nic_name = adapter['name']
-        nic_index = adapter['index']
-        registry_key_path = rf"{REG_PATH_MAC_SPOOFER}\{nic_index.zfill(4)}"
-        
-        try:
-            # Delete the NetworkAddress registry value to restore default MAC
-            UI.print_status(f"Resetting MAC for: {nic_name}...", status='info', indent=2)
-            
-            # Disable adapter
-            _run_shell_command_simple(f'netsh interface set interface name="{nic_name}" admin=disable', 
-                                     shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
-                                     capture_output_if_no_pipes=False)
-            time.sleep(1)
-            
-            # Delete the NetworkAddress value
-            reg_delete_cmd = ["reg", "delete", registry_key_path, "/v", "NetworkAddress", "/f"]
-            _run_shell_command_simple(reg_delete_cmd, shell=False, capture_output_if_no_pipes=True)
-            
-            # Enable adapter
-            _run_shell_command_simple(f'netsh interface set interface name="{nic_name}" admin=enable', 
-                                     shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, 
-                                     capture_output_if_no_pipes=False)
-            time.sleep(2)
-            
+        if restore_mac_for_adapter(adapter['name'], adapter['index']):
             reset_count += 1
-            UI.print_status(f"Reset MAC for {nic_name} to default.", status='success', indent=2)
-        except Exception as e:
-            UI.print_status(f"Could not reset {nic_name}: {e}", status='warning', indent=2)
-    
+
     if reset_count > 0:
         UI.print_status(f"{reset_count} network adapter(s) reset to default.", status='success')
     else:

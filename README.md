@@ -1,6 +1,44 @@
 # ByGone Spoofer
 
-Hardware identifier spoofing tool for Windows.
+<div align="center">
+
+Hardware identifier spoofing tool for Windows — built **specifically for Roblox**.
+
+[![Stars](https://img.shields.io/github/stars/nitaybl/ByGoneSpoofer?style=for-the-badge&logo=github&color=00b4d8)](https://github.com/nitaybl/ByGoneSpoofer/stargazers)
+[![Downloads](https://img.shields.io/github/downloads/nitaybl/ByGoneSpoofer/total?style=for-the-badge&logo=github&color=52b788)](https://github.com/nitaybl/ByGoneSpoofer/releases)
+[![Release](https://img.shields.io/github/v/release/nitaybl/ByGoneSpoofer?style=for-the-badge&color=9d4edd)](https://github.com/nitaybl/ByGoneSpoofer/releases/latest)
+[![License](https://img.shields.io/github/license/nitaybl/ByGoneSpoofer?style=for-the-badge&color=f77f00)](LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/3aZX4TukBC)
+
+</div>
+
+> 🎯 **This tool is made SPECIFICALLY for Roblox** — not Fortnite, not Valorant, not any
+> other game. If it happens to work elsewhere, that's a coincidence; it was never made
+> for that, and non-Roblox use isn't supported.
+
+## 📚 Documentation
+
+**Full step-by-step docs (GitBook):** the [`docs/`](docs/README.md) folder covers
+installation, a full spoof walkthrough, VPN setup, Windows activation, troubleshooting,
+and warnings. Start at [`docs/README.md`](docs/README.md).
+
+## 👀 What it looks like
+
+```text
+ ╭──────────────────────────────────────────────────────────────────────╮
+ │            Nitaybl's ByGone Spoofer (join discord.gg/3aZX4TukBC)       │
+ │              Version: v4.6 (Connectivity Check + Wider Adapters)       │
+ ╰──────────────────────────────────────────────────────────────────────╯
+
+    ─────────────────────────────  Main Menu  ─────────────────────────────
+
+        1. Spoofing
+        2. Fixer
+        3. Utilities
+        0. Exit
+
+    [?] Select an option:
+```
 
 ## ⚠️ Disclaimer
 
@@ -9,7 +47,9 @@ Hardware identifier spoofing tool for Windows.
 ## Features
 
 - **HWID Spoofing** - Modify system UUID, motherboard serial
-- **MAC Address Spoofing** - Change network adapter identifiers
+- **MAC Address Spoofing** - Change network adapter identifiers, with a post-spoof
+  connectivity check (pings google.com and offers to restore your MAC if you go offline)
+- **Wider Adapter Support** - Detects adapters via WMIC, PowerShell, or the registry
 - **EDID Spoofing** - Modify monitor serials
 - **Trace Removal** - Clean registry, event logs, temp files
 - **Backup & Restore** - Save and restore original hardware IDs
@@ -117,7 +157,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 - **Discord:** [discord.gg/3aZX4TukBC](https://discord.gg/3aZX4TukBC)
 - **Issues:** Open an issue in this repository
-- **Documentation:** See code comments in `ByGoneSpoofer.py`
+- **Documentation:** Full GitBook docs in the [`docs/`](docs/README.md) folder
 
 ---
 
