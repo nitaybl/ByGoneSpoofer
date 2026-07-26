@@ -53,3 +53,9 @@ artifacts/
 *.backup
 *.bak
 *~
+
+# Python
+__pycache__/
+*.py[cod]
+*.spec.bak
+

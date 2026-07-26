@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.6.0] - 2026-07-26
+
+### Added
+
+- **Post-spoof connectivity check** — After a MAC address is spoofed, the tool now
+  waits 10 seconds and pings `google.com`. If there is no response, it rechecks every
+  10 seconds for up to 40 seconds before timing out. On timeout the user is warned and
+  offered the choice to restore the original MAC address(es) or keep the spoofed ones.
+- **Wider network adapter detection** — Adapter enumeration now falls back through
+  multiple sources so adapters are found on a much wider range of machines:
+  1. `wmic` (Windows 10 / older builds)
+  2. PowerShell CIM (`Get-CimInstance Win32_NetworkAdapter`) for modern Windows 11
+     builds where `wmic` has been removed
+  3. Direct registry walk of the network class key (fully offline last resort)
+- **GitBook documentation site** — A complete `docs/` tree (getting started, usage
+  walkthrough, spoofing modes, VPN guidance, Windows activation, troubleshooting, and a
+  hard-spoof warning) plus a GitBook setup guide.
+
+### Changed
+
+- Extracted a shared `restore_mac_for_adapter()` helper used by both the Reverse Spoof
+  option and the new connectivity restore-offer.
+- Removed the redundant blind 10-second "stabilize" pauses in the Full / Light /
+  Recommended flows — the active connectivity check now handles adapter stabilization.
+- Refreshed `README.md`: Roblox-only banner, status badges, ASCII loader preview, and a
+  link to the GitBook docs.
+- Updated banner version string to v4.6.
+
+---
+
 ## [4.5.0] - 2026-07-12
 
 ### Added
