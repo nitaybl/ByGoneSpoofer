@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.7.0] - 2026-07-26
+
+### Fixed
+
+- **HWID spoof now actually changes the System UUID.** The SMBIOS spoof previously
+  passed the invalid argument `/SU Auto` to AMIDEWIN, so the UUID never changed. It now
+  generates a real random UUID and also randomizes the system and baseboard serials
+  (`/SU`, `/SS`, `/BS`), and surfaces AMIDEWIN's output when a write is blocked.
+- **HWID restore-from-backup now works.** `restore_hwid_from_backup()` called an
+  undefined `get_bundled_amidewin()` and always failed. Added `get_amidewin_exe()`
+  (downloads AMIDEWIN if needed), corrected the swapped `/SS` (system serial) and `/BS`
+  (baseboard serial) parameters, and hardened the WMIC CSV parsing.
+- **Roblox detection checks all install locations.** The WebView2 fixer only looked in
+  `C:\Program Files (x86)\Roblox\Versions`. It now searches `C:\Program Files`,
+  `C:\Program Files (x86)`, and `%LOCALAPPDATA%\Roblox\Versions`, picking the newest
+  version folder across all of them.
+- **LICENSE now detected by GitHub.** Moved the usage disclaimer into `DISCLAIMER.md`
+  so the `LICENSE` file is clean MIT text and GitHub's license detection recognizes it.
+
+### Added
+
+- **Automated Windows build & release** via GitHub Actions
+  (`.github/workflows/build-release.yml`): pushes to `main` and PRs build the EXE for
+  validation, and pushing a `v*` tag builds the EXE on a Windows runner and attaches it
+  to the GitHub Release automatically.
+
+### Changed
+
+- Updated banner version string to v4.7.
+- README: added a quick-links guide row at the top and a documentation index; docs
+  landing page no longer shows the screenshot-placeholder note.
+
+---
+
 ## [4.6.0] - 2026-07-26
 
 ### Added

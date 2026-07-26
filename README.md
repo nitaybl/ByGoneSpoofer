@@ -10,6 +10,8 @@ Hardware identifier spoofing tool for Windows — built **specifically for Roblo
 [![License](https://img.shields.io/github/license/nitaybl/ByGoneSpoofer?style=for-the-badge&color=f77f00)](LICENSE)
 [![Discord](https://img.shields.io/badge/Discord-Join%20Us-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/3aZX4TukBC)
 
+**📖 [Installation](docs/getting-started/installation.md) · [Walkthrough](docs/usage/walkthrough.md) · [Spoofing Modes](docs/usage/spoofing-modes.md) · [Use a VPN](docs/guides/vpn.md) · [Troubleshooting](docs/troubleshooting.md)**
+
 </div>
 
 > 🎯 **This tool is made SPECIFICALLY for Roblox** — not Fortnite, not Valorant, not any
@@ -19,15 +21,19 @@ Hardware identifier spoofing tool for Windows — built **specifically for Roblo
 ## 📚 Documentation
 
 **Full step-by-step docs (GitBook):** the [`docs/`](docs/README.md) folder covers
-installation, a full spoof walkthrough, VPN setup, Windows activation, troubleshooting,
-and warnings. Start at [`docs/README.md`](docs/README.md).
+everything below. Jump straight to a guide:
+
+- 🚀 [Installation](docs/getting-started/installation.md) · [First Run](docs/getting-started/first-run.md)
+- 📖 [Spoofing Modes](docs/usage/spoofing-modes.md) · [Full Walkthrough](docs/usage/walkthrough.md)
+- 🛡️ [Use a VPN (Warp)](docs/guides/vpn.md) · [Activating Windows](docs/guides/windows-activation.md)
+- ⚠️ [Hard Spoof Warning](docs/warnings/hard-spoof.md) · 🔧 [Troubleshooting](docs/troubleshooting.md)
 
 ## 👀 What it looks like
 
 ```text
  ╭──────────────────────────────────────────────────────────────────────╮
  │            Nitaybl's ByGone Spoofer (join discord.gg/3aZX4TukBC)       │
- │              Version: v4.6 (Connectivity Check + Wider Adapters)       │
+ │              Version: v4.7 (HWID Fixes + Roblox Path Detection)        │
  ╰──────────────────────────────────────────────────────────────────────╯
 
     ─────────────────────────────  Main Menu  ─────────────────────────────
@@ -151,7 +157,8 @@ Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) file for details. Usage terms and disclaimer:
+see [DISCLAIMER.md](DISCLAIMER.md).
 
 ## Support
 
