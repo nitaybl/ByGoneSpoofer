@@ -26,6 +26,10 @@ init(autoreset=True)
 DRY_RUN_MODE = False
 OPERATION_LOG = []
 
+# --- App / Update Info ---
+APP_VERSION = "4.8.0"
+GITHUB_REPO = "nitaybl/ByGoneSpoofer"
+
 
 # --- UI & Theming ---
 class Theme:
@@ -73,7 +77,7 @@ class UI:
 """
         print(f"{Theme.PRIMARY}{banner_art}{Theme.RESET}")
         title = "Nitaybl's ByGone Spoofer (join discord.gg/3aZX4TukBC)"
-        version = "Version: v4.7 (HWID Spoof/Restore Fixes + Roblox Path Detection)"
+        version = f"Version: v{APP_VERSION} (Auto-Updater + HWID/Path Fixes)"
         line = UI.LINE_H * (UI.WIDTH - 2)
         print(f"{Theme.PRIMARY}{UI.CORNER_TL}{line}{UI.CORNER_TR}{Theme.RESET}")
         print(
@@ -1017,6 +1021,144 @@ def _get_bloxstrap_latest_url():
     except Exception as e:
         UI.print_status(f"Failed to fetch BloxStrap release info: {e}", status='error')
         return None, None
+
+
+# --- Auto-Updater ---
+UPDATE_CONFIG_FILE = os.path.join(os.environ.get('APPDATA', os.path.expanduser('~')),
+                                  'ByGoneSpoofer_update.json')
+
+
+def _parse_version(v):
+    """Turn a version string like 'v4.7.0' into a comparable tuple (4, 7, 0)."""
+    parts = []
+    for chunk in str(v).strip().lstrip('vV').split('.'):
+        digits = ''.join(ch for ch in chunk if ch.isdigit())
+        parts.append(int(digits) if digits else 0)
+    return tuple(parts) if parts else (0,)
+
+
+def _is_newer(latest, current):
+    return _parse_version(latest) > _parse_version(current)
+
+
+def _load_update_config():
+    try:
+        with open(UPDATE_CONFIG_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def _save_update_config(cfg):
+    try:
+        with open(UPDATE_CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(cfg, f)
+    except Exception:
+        pass
+
+
+def check_for_updates():
+    """
+    Check GitHub for a newer release. If one exists, show its changelog and let the
+    user install now, be reminded next launch, or skip this version permanently.
+    Any network/parse error is swallowed so a failed check never blocks startup.
+    """
+    try:
+        resp = requests.get(f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest",
+                            headers={'User-Agent': 'ByGoneSpoofer', 'Accept': 'application/vnd.github+json'},
+                            timeout=6)
+        if resp.status_code != 200:
+            return
+        data = resp.json()
+    except Exception:
+        return  # offline or API issue — silently skip
+
+    latest_tag = data.get('tag_name', '')
+    if not latest_tag or not _is_newer(latest_tag, APP_VERSION):
+        return  # already up to date
+
+    # Respect a version the user chose to skip.
+    if _load_update_config().get('skipped_version') == latest_tag:
+        return
+
+    UI.print_header("Update Available")
+    UI.print_status(f"A new version is available: {latest_tag}  (you have v{APP_VERSION})",
+                    status='success')
+
+    changelog = (data.get('body') or '').strip()
+    if changelog:
+        UI.print_status("What's new:", status='info')
+        for line in changelog.splitlines()[:25]:
+            print(f"        {Theme.MUTED}{line}{Theme.RESET}")
+        print()
+
+    choice = UI.get_input("Update now? ([y] install  /  [l] remind me later  /  [s] skip this version)")
+    if choice in ('y', 'yes'):
+        _apply_update(data, latest_tag)
+    elif choice in ('s', 'skip'):
+        cfg = _load_update_config()
+        cfg['skipped_version'] = latest_tag
+        _save_update_config(cfg)
+        UI.print_status(f"Skipping {latest_tag}. You won't be reminded about it again.", status='info')
+    else:
+        UI.print_status("Okay — I'll remind you next time you launch.", status='info')
+
+
+def _apply_update(data, latest_tag):
+    """Download the new EXE and hand off to a batch script that swaps it in and relaunches."""
+    exe_asset = next((a for a in data.get('assets', []) if a.get('name', '').lower().endswith('.exe')), None)
+    release_url = data.get('html_url', f"https://github.com/{GITHUB_REPO}/releases/latest")
+
+    # Running from source (not compiled): can't self-replace a .py cleanly.
+    if not getattr(sys, 'frozen', False):
+        UI.print_status("You're running from source. Update via 'git pull' or download the latest build:",
+                        status='warning')
+        UI.print_status(release_url, status='info', indent=2)
+        return
+
+    if not exe_asset:
+        UI.print_status("No EXE found in the release. Opening the releases page instead...", status='warning')
+        try:
+            os.startfile(release_url)  # noqa: only exists on Windows
+        except Exception:
+            UI.print_status(release_url, status='info', indent=2)
+        return
+
+    current_exe = sys.executable
+    new_exe = os.path.join(os.path.dirname(current_exe), "ByGoneSpoofer_update.exe")
+
+    UI.print_status(f"Downloading {latest_tag}...", status='action')
+    if not _download_file_with_progress(exe_asset['browser_download_url'], new_exe, label="Update"):
+        UI.print_status("Update download failed. Please download manually:", status='error')
+        UI.print_status(release_url, status='info', indent=2)
+        return
+
+    # Batch: wait for this process to exit, replace the old EXE, relaunch, self-delete.
+    bat_path = os.path.join(os.environ.get('TEMP', os.path.dirname(current_exe)), 'bygone_update.bat')
+    bat = (
+        "@echo off\r\n"
+        "echo Updating ByGone Spoofer...\r\n"
+        ":wait\r\n"
+        f'del "{current_exe}" >nul 2>&1\r\n'
+        f'if exist "{current_exe}" (\r\n'
+        "    timeout /t 1 /nobreak >nul\r\n"
+        "    goto wait\r\n"
+        ")\r\n"
+        f'move /y "{new_exe}" "{current_exe}" >nul\r\n'
+        f'start "" "{current_exe}"\r\n'
+        'del "%~f0"\r\n'
+    )
+    try:
+        with open(bat_path, 'w', encoding='utf-8') as f:
+            f.write(bat)
+        UI.print_status("Installing update and restarting...", status='success')
+        subprocess.Popen(f'start "" /min "{bat_path}"', shell=True)
+        sys.exit(0)
+    except SystemExit:
+        raise
+    except Exception as e:
+        UI.print_status(f"Could not launch updater: {e}", status='error')
+        UI.print_status(release_url, status='info', indent=2)
 
 
 def install_roblox():
@@ -2178,6 +2320,8 @@ def main():
     UI.print_status("Running as administrator.", status='success')
     if not PYWIN32_AVAILABLE:
         UI.print_status("pywin32 not found. Some features might have fallbacks.", status='warning')
+
+    check_for_updates()
 
     while True:
         try:
